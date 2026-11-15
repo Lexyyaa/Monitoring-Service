@@ -68,6 +68,6 @@ Pod 100,000건 환경의 API와 SQL 측정 기록이다.
 - 실행: [env.sh](../../scripts/e2e/env.sh) `up` (Compose 프로젝트 `monitoring-e2e`, 새 볼륨)
   - nginx 화면 `localhost:13100`, 백엔드 `localhost:18100`, PostgreSQL `localhost:55100`
 - 이미지: backend(Temurin 21 JRE, 392MB), frontend(nginx 1.27, 76MB), postgres:17
-- Docker Desktop 자원: CPU 10, 메모리 약 7.6GiB
+- Docker Desktop 자원: CPU 10, 메모리 약 7.75GiB
 - 데이터: 시드 적재 후 검증 통과 (Cluster 20, Node 200, Namespace 2,000, Pod 100,000), Flyway V1·V2 적용
 - 부하 조건: k6 5 VU, 20초, 반복마다 주요 GET 7개 호출 후 0.5초 대기
