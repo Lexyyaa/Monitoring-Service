@@ -43,3 +43,10 @@
 - TREE-T02: E2E 통과. 펼칠 때마다 직접 하위 요청 1건씩만 보냈다.
 - TREE-T06: 저장소 통합 테스트 통과. 공유 Namespace를 만든 뒤에도 Node 아래 Namespace가 중복되지 않는다.
 - TREE-T09: E2E 통과. 2,220행을 펼치고 스크롤하는 동안 DOM의 행은 40개 이하였다.
+
+## 상세 API
+
+- UNIT-03: 단위 테스트 통과 (`ResourceServiceTest`)
+- DETAIL-T05, T06과 네 종류 정상 응답: 통합 테스트 통과 (`ResourceApiIntegrationTest`)
+- DETAIL-T03, T04의 API 규칙: 통합 테스트 통과. 공유 Namespace에서 `nodeId=2`는 Node 2 경로, `nodeId`가 없으면 Node 1 경로였다.
+- DB-08(상세): `pods` 조회는 `id`, `namespace_id`, `node_id` 조건이 붙는다. 대표 Node 조회는 인덱스만 읽었다(0.02ms).

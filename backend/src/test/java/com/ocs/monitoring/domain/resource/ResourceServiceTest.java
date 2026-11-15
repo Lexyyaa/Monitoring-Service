@@ -1,6 +1,6 @@
 /************************************************************************
  * 도메인 서비스 단위 테스트 (Mockito로 Repository를 대신함, DB 없이 실행)
- * 없는 부모와 다른 Cluster 경로가 404이고, 그때 하위 조회를 하지 않는지 확인한다
+ * 없는 부모와 다른 Cluster 경로가 404이고 하위 조회를 하지 않는지, Namespace 외 nodeId가 400인지 확인한다
  ************************************************************************/
 package com.ocs.monitoring.domain.resource;
 
@@ -71,5 +71,15 @@ class ResourceServiceTest {
                 .extracting("errorCode")
                 .isEqualTo(ErrorCode.RESOURCE_NOT_FOUND);
         then(treeRepository).should(never()).findPods(anyLong(), anyLong());
+    }
+
+    @Test
+    @DisplayName("UNIT-03 Namespace가 아닌 상세에 nodeId를 주면 400 예외다")
+    void nodeIdOnlyForNamespace() {
+        assertThatThrownBy(() -> resourceService.getDetail(ResourceType.POD, 1, 1L))
+                .isInstanceOf(ResourceException.class)
+                .extracting("errorCode")
+                .isEqualTo(ErrorCode.INVALID_PARAMETER);
+        then(resourceRepository).shouldHaveNoInteractions();
     }
 }

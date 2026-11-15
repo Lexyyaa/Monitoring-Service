@@ -15,6 +15,7 @@ import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.autoconfigure.web.servlet.AutoConfigureMockMvc;
 import org.springframework.boot.test.context.SpringBootTest;
+import org.springframework.jdbc.core.JdbcTemplate;
 import org.springframework.test.web.servlet.MockMvc;
 import org.springframework.test.web.servlet.ResultActions;
 import org.springframework.transaction.annotation.Transactional;
@@ -28,6 +29,9 @@ class ResourceApiIntegrationTest {
 
     @Autowired
     private MockMvc mockMvc;
+
+    @Autowired
+    private JdbcTemplate jdbcTemplate;
 
     /** 공통 오류 본문은 code와 message 두 필드만 있다 */
     private static void expectError(ResultActions result, String code) throws Exception {
@@ -81,5 +85,68 @@ class ResourceApiIntegrationTest {
         expectError(
                 mockMvc.perform(post(API + "/clusters")).andExpect(status().isMethodNotAllowed()),
                 "METHOD_NOT_ALLOWED");
+    }
+
+    /************************************************************
+     * 상세 : 시드 기준 Pod 1 = cluster-01 → node-01-01 → ns-01-001 → pod-payment-api-error
+     ************************************************************/
+    @Test
+    @DisplayName("네 종류 상세는 공통 필드, 종류별 속성, 탐색 경로를 돌려준다")
+    void detailOfFourTypes() throws Exception {
+        mockMvc.perform(get(API + "/resources/CLUSTER/1"))
+                .andExpect(status().isOk())
+                .andExpect(jsonPath("$.resource.path.length()").value(1))
+                .andExpect(jsonPath("$.resource.attributes.kubernetesVersion").value("1.31"))
+                .andExpect(jsonPath("$.fetchedAt").isNotEmpty());
+        mockMvc.perform(get(API + "/resources/NODE/1"))
+                .andExpect(status().isOk())
+                .andExpect(jsonPath("$.resource.path[0].id").value(1))
+                .andExpect(jsonPath("$.resource.attributes.readyCondition").value("True"));
+        mockMvc.perform(get(API + "/resources/NAMESPACE/1?nodeId=1"))
+                .andExpect(status().isOk())
+                .andExpect(jsonPath("$.resource.path[1].resourceType").value("NODE"))
+                .andExpect(jsonPath("$.resource.attributes.phase").value("Active"));
+        mockMvc.perform(get(API + "/resources/POD/1"))
+                .andExpect(status().isOk())
+                .andExpect(jsonPath("$.resource.statusCode").value("Failed"))
+                .andExpect(jsonPath("$.resource.issueLevel").value("ERROR"))
+                .andExpect(jsonPath("$.resource.issueReason").isNotEmpty())
+                .andExpect(jsonPath("$.resource.path.length()").value(4))
+                .andExpect(jsonPath("$.resource.attributes.restartCount").value(5));
+    }
+
+    @Test
+    @DisplayName("DETAIL-T05 없는 리소스나 이 Namespace의 Pod가 없는 Node로 상세를 요청하면 404")
+    void detailNotFound() throws Exception {
+        expectError(
+                mockMvc.perform(get(API + "/resources/POD/999999")).andExpect(status().isNotFound()),
+                "RESOURCE_NOT_FOUND");
+        expectError(
+                mockMvc.perform(get(API + "/resources/NAMESPACE/1?nodeId=11")).andExpect(status().isNotFound()),
+                "RESOURCE_NOT_FOUND");
+    }
+
+    @Test
+    @DisplayName("DETAIL-T06 Namespace 외 상세에 nodeId를 주거나 없는 종류면 400")
+    void detailBadRequest() throws Exception {
+        expectError(
+                mockMvc.perform(get(API + "/resources/POD/1?nodeId=1")).andExpect(status().isBadRequest()),
+                "INVALID_PARAMETER");
+        expectError(
+                mockMvc.perform(get(API + "/resources/DEPLOYMENT/1")).andExpect(status().isBadRequest()),
+                "INVALID_PARAMETER");
+    }
+
+    @Test
+    @DisplayName("공유 Namespace 상세는 클릭한 Node 경로를 지키고, 경로가 없으면 Pod가 있는 최소 ID Node를 쓴다")
+    void sharedNamespaceDetailPath() throws Exception {
+        jdbcTemplate.update("UPDATE pods SET node_id = 2 WHERE id = 1");
+
+        mockMvc.perform(get(API + "/resources/NAMESPACE/1?nodeId=2"))
+                .andExpect(status().isOk())
+                .andExpect(jsonPath("$.resource.path[1].id").value(2));
+        mockMvc.perform(get(API + "/resources/NAMESPACE/1"))
+                .andExpect(status().isOk())
+                .andExpect(jsonPath("$.resource.path[1].id").value(1));
     }
 }
