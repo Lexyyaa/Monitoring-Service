@@ -11,6 +11,8 @@ import { expect, test, type Page } from '@playwright/test';
  * 화면 영역과 동작
  ************************************************************/
 export const tree = (page: Page) => page.getByRole('tree', { name: 'Kubernetes 리소스' });
+export const searchPanel = (page: Page) => page.getByRole('region', { name: '리소스 검색' });
+export const searchInput = (page: Page) => page.getByLabel('전체 리소스 검색');
 export const detailPanel = (page: Page) => page.locator('aside[aria-label="리소스 상세"]');
 export const nameButton = (page: Page, name: string) =>
   tree(page).getByRole('button', { name, exact: true });

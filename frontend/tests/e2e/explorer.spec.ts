@@ -11,8 +11,12 @@ import {
   openDetail,
   recordApiRequests,
   row,
+  searchInput,
+  searchPanel,
   waitTreeIdle,
 } from './helpers';
+
+const ERROR_POD = 'pod-payment-api-error';
 
 test.describe('성공 케이스', () => {
   test('TREE-T02 펼친 부모의 직접 하위만 요청한다', async ({ page }) => {
@@ -57,6 +61,24 @@ test.describe('성공 케이스', () => {
     await expect(detailPanel(page).locator('.detail-path li')).toHaveCount(4);
     await expect(detailPanel(page).getByText('restartCount')).toBeVisible();
     await expect(row(page, 'pod-01-001-045')).toHaveClass(/selected/);
+  });
+
+  test('SEARCH-T05 검색 결과를 고르면 경로를 열고 상세를 표시한다', async ({ page }) => {
+    await page.goto('/');
+
+    await searchInput(page).fill(ERROR_POD);
+    await searchPanel(page)
+      .getByRole('button', { name: new RegExp(ERROR_POD) })
+      .click();
+
+    await expect(row(page, ERROR_POD)).toHaveClass(/selected/);
+    await expect(row(page, ERROR_POD)).toBeInViewport();
+    await expect(detailPanel(page).locator('.detail-path li')).toHaveText([
+      'cluster-01',
+      'node-01-01',
+      'ns-01-001',
+      ERROR_POD,
+    ]);
   });
 });
 
