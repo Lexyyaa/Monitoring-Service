@@ -1,6 +1,6 @@
 /************************************************************************
  * 가짜 API 서버 (MSW)
- * 실제 백엔드와 같은 주소·응답 모양으로 트리와 상세를 돌려준다
+ * 실제 백엔드와 같은 주소·응답 모양으로 트리·검색·상세를 돌려준다
  ************************************************************************/
 
 import { http, HttpResponse } from 'msw';
@@ -78,6 +78,24 @@ export const handlers = [
       ),
     ),
   ),
+  http.get(`${API}/resources/search`, ({ request }) => {
+    const url = new URL(request.url);
+    const q = (url.searchParams.get('q') ?? '').trim().toLowerCase();
+    const page = Number(url.searchParams.get('page') ?? 0);
+    const matched = mockData
+      .filter((r) => r.name.toLowerCase().includes(q))
+      .sort((a, b) => a.name.localeCompare(b.name));
+    const items = matched
+      .slice(page * 20, page * 20 + 20)
+      .map((r) => ({ ...treeItem(r), path: path(r) }));
+    return HttpResponse.json({
+      items,
+      page,
+      pageSize: 20,
+      hasNext: matched.length > page * 20 + 20,
+      fetchedAt: now(),
+    });
+  }),
   http.get(`${API}/resources/:type/:id`, ({ request, params }) => {
     const item = findResource(params.type as MockResource['resourceType'], Number(params.id));
     if (!item) {

@@ -24,6 +24,18 @@ export interface PathSegment {
   name: string;
 }
 
+export interface SearchItem extends TreeItem {
+  path: PathSegment[];
+}
+
+export interface SearchResponse {
+  items: SearchItem[];
+  page: number;
+  pageSize: number;
+  hasNext: boolean;
+  fetchedAt: string;
+}
+
 export interface ResourceDetail {
   id: number;
   resourceType: ResourceType;

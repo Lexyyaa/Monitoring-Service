@@ -20,6 +20,8 @@ export type User = ReturnType<typeof renderApp>;
  ************************************************************/
 export const tree = () => screen.getByRole('tree', { name: 'Kubernetes 리소스' });
 export const treePanel = () => screen.getByRole('region', { name: '리소스 트리' });
+export const searchPanel = () => screen.getByRole('region', { name: '리소스 검색' });
+export const searchInput = () => screen.getByLabelText('전체 리소스 검색');
 export const detailPanel = () => screen.getByLabelText('리소스 상세', { selector: 'aside' });
 
 /************************************************************

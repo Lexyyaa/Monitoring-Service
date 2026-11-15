@@ -12,6 +12,7 @@ export const resourceKeys = {
       parent.id,
       parent.resourceType === 'NAMESPACE' ? parent.nodeId : null,
     ] as const,
+  search: (query: string) => ['resources', 'search', { query }] as const,
   detail: (selection?: Selection) =>
     [
       'resources',
