@@ -8,6 +8,7 @@ import org.springframework.http.MediaType;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 
 @RestController
@@ -42,5 +43,17 @@ public class ResourceController {
             @PathVariable @Positive long nodeId, @PathVariable @Positive long namespaceId) {
         ResourceCommand.Pods command = new ResourceCommand.Pods(nodeId, namespaceId);
         return ResourceResponse.TreeList.from(resourceApplicationService.listPods(command));
+    }
+
+    /************************************************************
+     * 상세 (nodeId는 Namespace 상세에서만 허용)
+     ************************************************************/
+    @GetMapping("/resources/{resourceType}/{resourceId}")
+    public ResourceResponse.Detail getDetail(
+            @PathVariable String resourceType,
+            @PathVariable @Positive long resourceId,
+            @RequestParam(required = false) @Positive Long nodeId) {
+        ResourceCommand.Detail command = new ResourceCommand.Detail(resourceType, resourceId, nodeId);
+        return ResourceResponse.Detail.from(resourceApplicationService.getDetail(command));
     }
 }

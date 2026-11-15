@@ -9,6 +9,9 @@ import jakarta.persistence.Id;
 import jakarta.persistence.Table;
 import java.math.BigDecimal;
 import java.time.Instant;
+import java.util.LinkedHashMap;
+import java.util.List;
+import java.util.Map;
 import lombok.AccessLevel;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
@@ -60,5 +63,30 @@ public class Node {
         if (!clusterId.equals(namespace.getClusterId())) {
             throw ResourceException.notFound();
         }
+    }
+
+    /************************************************************
+     * 상세와 탐색 경로
+     ************************************************************/
+    public PathSegment toPathSegment() {
+        return new PathSegment(ResourceType.NODE, id, name);
+    }
+
+    public ResourceDetail toDetail(Cluster cluster) {
+        Map<String, Object> attributes = new LinkedHashMap<>();
+        attributes.put("readyCondition", readyCondition);
+        attributes.put("cpuUsagePercent", cpuUsagePercent);
+        attributes.put("memoryUsagePercent", memoryUsagePercent);
+        attributes.put("diskUsagePercent", diskUsagePercent);
+        return new ResourceDetail(
+                id,
+                ResourceType.NODE,
+                name,
+                readyCondition,
+                issueLevel,
+                issueReason,
+                lastUpdatedAt,
+                List.of(cluster.toPathSegment(), toPathSegment()),
+                attributes);
     }
 }

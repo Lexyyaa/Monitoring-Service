@@ -7,6 +7,9 @@ import jakarta.persistence.Enumerated;
 import jakarta.persistence.Id;
 import jakarta.persistence.Table;
 import java.time.Instant;
+import java.util.LinkedHashMap;
+import java.util.List;
+import java.util.Map;
 import lombok.AccessLevel;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
@@ -58,4 +61,30 @@ public class Pod {
 
     @Column(name = "last_updated_at", nullable = false)
     private Instant lastUpdatedAt;
+
+    /************************************************************
+     * 상세와 탐색 경로
+     ************************************************************/
+    public PathSegment toPathSegment() {
+        return new PathSegment(ResourceType.POD, id, name);
+    }
+
+    public ResourceDetail toDetail(Cluster cluster, Node node, Namespace namespace) {
+        Map<String, Object> attributes = new LinkedHashMap<>();
+        attributes.put("phase", phase);
+        attributes.put("ready", ready);
+        attributes.put("restartCount", restartCount);
+        attributes.put("cpuUsageMillicores", cpuUsageMillicores);
+        attributes.put("memoryUsageMib", memoryUsageMib);
+        return new ResourceDetail(
+                id,
+                ResourceType.POD,
+                name,
+                phase,
+                issueLevel,
+                issueReason,
+                lastUpdatedAt,
+                List.of(cluster.toPathSegment(), node.toPathSegment(), namespace.toPathSegment(), toPathSegment()),
+                attributes);
+    }
 }

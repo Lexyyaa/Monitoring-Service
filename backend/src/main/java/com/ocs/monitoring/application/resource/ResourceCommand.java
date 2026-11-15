@@ -11,4 +11,6 @@ public final class ResourceCommand {
     public record Namespaces(long nodeId) {}
 
     public record Pods(long nodeId, long namespaceId) {}
+
+    public record Detail(String resourceType, long resourceId, Long nodeId) {}
 }

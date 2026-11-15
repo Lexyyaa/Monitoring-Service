@@ -7,6 +7,9 @@ import jakarta.persistence.Enumerated;
 import jakarta.persistence.Id;
 import jakarta.persistence.Table;
 import java.time.Instant;
+import java.util.LinkedHashMap;
+import java.util.List;
+import java.util.Map;
 import lombok.AccessLevel;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
@@ -40,4 +43,27 @@ public class Cluster {
 
     @Column(name = "last_updated_at", nullable = false)
     private Instant lastUpdatedAt;
+
+    /************************************************************
+     * 상세와 탐색 경로
+     ************************************************************/
+    public PathSegment toPathSegment() {
+        return new PathSegment(ResourceType.CLUSTER, id, name);
+    }
+
+    public ResourceDetail toDetail() {
+        Map<String, Object> attributes = new LinkedHashMap<>();
+        attributes.put("controlPlaneStatus", controlPlaneStatus);
+        attributes.put("kubernetesVersion", kubernetesVersion);
+        return new ResourceDetail(
+                id,
+                ResourceType.CLUSTER,
+                name,
+                controlPlaneStatus,
+                issueLevel,
+                issueReason,
+                lastUpdatedAt,
+                List.of(toPathSegment()),
+                attributes);
+    }
 }
