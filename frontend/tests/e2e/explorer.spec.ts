@@ -89,7 +89,10 @@ test.describe('성공 케이스', () => {
 
   test('FILTER-T05 실제 데이터에서 검색어와 필터를 함께 적용한다', async ({ page }) => {
     await page.goto('/');
-    await page.getByRole('radio', { name: 'ERROR' }).check();
+    await page
+      .locator('.filter-option', { has: page.getByRole('radio', { name: 'ERROR' }) })
+      .click();
+    await expect(page.getByRole('radio', { name: 'ERROR' })).toBeChecked();
 
     await searchInput(page).fill('api');
 
@@ -158,7 +161,10 @@ test.describe('갱신', () => {
     const original = sql('SELECT issue_level FROM pods WHERE id = 1');
     try {
       await page.goto('/');
-      await page.getByRole('radio', { name: 'ERROR' }).check();
+      await page
+        .locator('.filter-option', { has: page.getByRole('radio', { name: 'ERROR' }) })
+        .click();
+      await expect(page.getByRole('radio', { name: 'ERROR' })).toBeChecked();
       await searchInput(page).fill(ERROR_POD);
       await searchPanel(page)
         .getByRole('button', { name: new RegExp(ERROR_POD) })
