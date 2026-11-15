@@ -18,24 +18,24 @@ public class ResourceService {
      * 없는 부모는 빈 목록이 아니라 404다 (하위 없음으로 오해하지 않게)
      ************************************************************/
     public List<TreeResource> listClusters() {
-        return treeRepository.findClusters();
+        return treeRepository.findClusters(null);
     }
 
     public List<TreeResource> listNodes(long clusterId) {
         Cluster cluster = getCluster(clusterId);
-        return treeRepository.findNodes(cluster.getId());
+        return treeRepository.findNodes(cluster.getId(), null);
     }
 
     public List<TreeResource> listNamespaces(long nodeId) {
         Node node = getNode(nodeId);
-        return treeRepository.findNamespaces(node.getId());
+        return treeRepository.findNamespaces(node.getId(), null);
     }
 
     public List<TreeResource> listPods(long nodeId, long namespaceId) {
         Node node = getNode(nodeId);
         Namespace namespace = getNamespace(namespaceId);
         node.requireSameCluster(namespace);
-        return treeRepository.findPods(node.getId(), namespace.getId());
+        return treeRepository.findPods(node.getId(), namespace.getId(), null);
     }
 
     /************************************************************

@@ -7,6 +7,7 @@ package com.ocs.monitoring.domain.resource;
 
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.assertj.core.api.Assertions.assertThatThrownBy;
+import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.ArgumentMatchers.anyLong;
 import static org.mockito.BDDMockito.given;
 import static org.mockito.BDDMockito.then;
@@ -65,7 +66,7 @@ class ResourceServiceTest {
                 .isInstanceOf(ResourceException.class)
                 .extracting("errorCode")
                 .isEqualTo(ErrorCode.RESOURCE_NOT_FOUND);
-        then(treeRepository).should(never()).findNodes(anyLong());
+        then(treeRepository).should(never()).findNodes(anyLong(), any());
     }
 
     @Test
@@ -78,7 +79,7 @@ class ResourceServiceTest {
                 .isInstanceOf(ResourceException.class)
                 .extracting("errorCode")
                 .isEqualTo(ErrorCode.RESOURCE_NOT_FOUND);
-        then(treeRepository).should(never()).findPods(anyLong(), anyLong());
+        then(treeRepository).should(never()).findPods(anyLong(), anyLong(), any());
     }
 
     @Test
