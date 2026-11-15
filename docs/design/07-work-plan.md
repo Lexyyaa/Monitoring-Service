@@ -55,7 +55,7 @@
   - 확인: `DB-03`부터 `DB-06`까지 실제 PostgreSQL에서 실행한다.
 - [x] **P01-04** `feat: 목표 규모 Mock 시드와 검증 SQL 추가`
   - 완료: Cluster 20, Node 200, Namespace 2,000, Pod 100,000건 이상을 재현 가능하게 적재한다.
-- [ ] **P01-05** `test: 시드 건수와 공유 Namespace 검증`
+- [x] **P01-05** `test: 시드 건수와 공유 Namespace 검증`
   - 확인: `DB-01`, `DB-02`, `DB-07`을 전용 DB에서 실행한다.
 - [ ] **P01-06** `feat: 트리 직접 하위 조회 저장소 구현`
   - 완료: Node 아래 Namespace를 해당 Node의 Pod에서 찾고, Pod는 Node와 Namespace를 함께 제한한다.
