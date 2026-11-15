@@ -11,6 +11,7 @@ public class ResourceService {
 
     private final ResourceRepository resourceRepository;
     private final ResourceTreeRepository treeRepository;
+    private final ResourceSearchRepository searchRepository;
 
     /************************************************************
      * 트리 : 부모를 확인한 뒤 직접 하위 한 단계만 조회한다
@@ -70,6 +71,15 @@ public class ResourceService {
                 .findPodLocation(id)
                 .orElseThrow(ResourceException::notFound)
                 .toDetail();
+    }
+
+    /************************************************************
+     * 검색 : 한 건 더 읽어 다음 페이지 여부를 판단한다 (총건수 집계 없음)
+     ************************************************************/
+    public ResourceSearchPage search(String query, int page) {
+        SearchPageRequest request = new SearchPageRequest(page);
+        List<ResourceSearchItem> rows = searchRepository.search(query.trim(), request.offset(), request.fetchSize());
+        return ResourceSearchPage.of(rows);
     }
 
     /************************************************************

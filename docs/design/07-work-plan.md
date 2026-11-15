@@ -86,7 +86,7 @@
 
 관련 문서: [검색과 필터 요구사항](01-requirements.md), [검색 API](04-api-spec.md), [SEARCH, FILTER 시나리오](06-test-scenarios.md), [검색 인덱스 결정](02-adr.md).
 
-- [ ] **P02-01** `feat: 네 리소스 이름 검색 조회 구현`
+- [x] **P02-01** `feat: 네 리소스 이름 검색 조회 구현`
   - 완료: 미확장 분기도 DB에서 검색하고 안정 정렬, 20건 페이지, 대표 경로를 제공한다.
 - [ ] **P02-02** `feat: 이름 검색 API 구현`
   - 완료: `q`, `page`, `hasNext`, `fetchedAt`과 입력 오류가 계약에 맞는다.
