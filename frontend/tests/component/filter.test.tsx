@@ -10,7 +10,8 @@ import { API, requestLog, server, unavailable } from '../mocks/server';
 import {
   detailPanel,
   expand,
-  filterSelect,
+  filterOption,
+  selectFilter,
   openDetail,
   renderApp,
   searchInput,
@@ -31,10 +32,10 @@ describe('성공 케이스', () => {
     await waitForRow('cluster-01');
 
     for (const level of ['NONE', 'WARNING', 'ERROR', 'UNKNOWN']) {
-      await user.selectOptions(filterSelect(), level);
+      await selectFilter(user, level);
       await waitFor(() => expect(requestLog).toContain(`/clusters?issueLevel=${level}`));
     }
-    await user.selectOptions(filterSelect(), 'ALL');
+    await selectFilter(user, '전체');
 
     await waitFor(() => expect(rowNames()).toEqual(['cluster-01', 'cluster-02']));
     expect(within(tree()).queryByText('PATH')).not.toBeInTheDocument();
@@ -42,7 +43,7 @@ describe('성공 케이스', () => {
 
   test('FILTER-T03 자기만 일치하는 Namespace는 MATCH이고 펼치면 하위가 없다고 보여 준다', async () => {
     const user = renderApp();
-    await user.selectOptions(filterSelect(), 'UNKNOWN');
+    await selectFilter(user, 'UNKNOWN');
     await expand(user, 'cluster-01');
     await expand(user, 'node-01-01');
     await waitForRow('ns-01-002');
@@ -61,7 +62,7 @@ describe('성공 케이스', () => {
     await expand(user, 'cluster-01');
     await waitForRow('node-01-01');
 
-    await user.selectOptions(filterSelect(), 'ERROR');
+    await selectFilter(user, 'ERROR');
     await waitForRow('node-01-01');
 
     expect(within(tree()).getByRole('button', { name: '접기 cluster-01' })).toBeVisible();
@@ -75,7 +76,7 @@ describe('성공 케이스', () => {
     await user.type(searchInput(), 'pod');
     await within(searchPanel()).findByText('pod-ok');
 
-    await user.selectOptions(filterSelect(), 'WARNING');
+    await selectFilter(user, 'WARNING');
 
     await waitFor(() =>
       expect(within(searchPanel()).queryByText('pod-ok')).not.toBeInTheDocument(),
@@ -88,7 +89,7 @@ describe('성공 케이스', () => {
     const user = renderApp();
     await openDetail(user, 'cluster-01');
 
-    await user.selectOptions(filterSelect(), 'ERROR');
+    await selectFilter(user, 'ERROR');
     await within(tree()).findByText('PATH');
 
     expect(within(detailPanel()).queryByText(/필터에 일치하지 않습니다/)).not.toBeInTheDocument();
@@ -98,7 +99,7 @@ describe('성공 케이스', () => {
     const user = renderApp();
     await openDetail(user, 'cluster-02');
 
-    await user.selectOptions(filterSelect(), 'ERROR');
+    await selectFilter(user, 'ERROR');
 
     expect(
       await within(detailPanel()).findByText('현재 상세 리소스는 ERROR 필터에 일치하지 않습니다.'),
@@ -120,10 +121,10 @@ describe('실패 케이스', () => {
     const user = renderApp();
     await openDetail(user, 'cluster-01');
 
-    await user.selectOptions(filterSelect(), 'ERROR');
+    await selectFilter(user, 'ERROR');
     const alert = await within(treePanel()).findByRole('alert');
 
-    expect(filterSelect()).toHaveValue('ERROR');
+    expect(filterOption('ERROR')).toBeChecked();
     expect(within(detailPanel()).getByText('cluster-01', { selector: 'strong' })).toBeVisible();
 
     outage.failing = false;
@@ -144,9 +145,9 @@ describe('엣지 케이스', () => {
     const user = renderApp();
     await waitForRow('cluster-02');
 
-    await user.selectOptions(filterSelect(), 'ERROR');
-    await user.selectOptions(filterSelect(), 'WARNING');
-    await user.selectOptions(filterSelect(), 'ALL');
+    await selectFilter(user, 'ERROR');
+    await selectFilter(user, 'WARNING');
+    await selectFilter(user, '전체');
     await delay(700);
 
     expect(rowNames()).toEqual(['cluster-01', 'cluster-02']);

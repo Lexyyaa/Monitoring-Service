@@ -45,7 +45,6 @@ export default function MonitoringPage() {
         <h1 className="app-title">
           Infrastructure Monitoring <span>· Kubernetes</span>
         </h1>
-        <IssueLevelFilter value={issueLevel} onChange={setIssueLevel} />
         <RefreshControl
           isRefreshing={refresh.isRefreshing}
           lastSuccessfulFetch={refresh.lastSuccessfulFetch}
@@ -53,16 +52,19 @@ export default function MonitoringPage() {
         />
       </header>
       <main className={`explorer-layout ${isDetailOpen ? 'with-detail' : ''}`}>
-        <ResourceSearch search={search} onSelectResult={(item) => void tree.openPath(item)} />
-        <ResourceTree tree={tree} selectedKey={selected?.key} />
+        <div className="explorer-main">
+          <IssueLevelFilter value={issueLevel} onChange={setIssueLevel} />
+          <ResourceSearch search={search} onSelectResult={(item) => void tree.openPath(item)} />
+          <ResourceTree tree={tree} selectedKey={selected?.key} />
+        </div>
+        <ResourceDetailPanel
+          selection={selection}
+          issueLevel={issueLevel}
+          currentMatchRole={currentMatchRole}
+          state={detail}
+          onClose={() => setSelected(undefined)}
+        />
       </main>
-      <ResourceDetailPanel
-        selection={selection}
-        issueLevel={issueLevel}
-        currentMatchRole={currentMatchRole}
-        state={detail}
-        onClose={() => setSelected(undefined)}
-      />
     </>
   );
 }
