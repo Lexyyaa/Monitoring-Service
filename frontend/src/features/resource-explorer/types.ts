@@ -18,10 +18,33 @@ export interface TreeResponse {
   fetchedAt: string;
 }
 
+export interface PathSegment {
+  resourceType: ResourceType;
+  id: number;
+  name: string;
+}
+
+export interface ResourceDetail {
+  id: number;
+  resourceType: ResourceType;
+  name: string;
+  statusCode: string;
+  issueLevel: IssueLevel;
+  issueReason: string | null;
+  lastUpdatedAt: string;
+  path: PathSegment[];
+  attributes: Record<string, string | number | boolean | null>;
+}
+
+export interface DetailResponse {
+  resource: ResourceDetail;
+  fetchedAt: string;
+}
+
 /************************************************************
  * 화면 상태
  * ParentRef : 하위 목록을 요청할 부모 (Namespace는 트리에서 지나온 Node가 필요)
- * Selection : 선택한 리소스 (객체 전체가 아니라 종류 + ID)
+ * Selection : 상세 패널에 띄울 리소스 (객체 전체가 아니라 종류 + ID, Namespace는 클릭한 Node 경로)
  ************************************************************/
 export type ParentRef =
   | { resourceType: 'CLUSTER' | 'NODE'; id: number }

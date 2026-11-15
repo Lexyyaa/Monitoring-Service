@@ -1,11 +1,11 @@
 /************************************************************************
  * 가짜 API 서버 (MSW)
- * 실제 백엔드와 같은 주소·응답 모양으로 트리를 돌려준다
+ * 실제 백엔드와 같은 주소·응답 모양으로 트리와 상세를 돌려준다
  ************************************************************************/
 
 import { http, HttpResponse } from 'msw';
 import { setupServer } from 'msw/node';
-import { mockData, type MockResource } from './data';
+import { findResource, mockData, type MockResource } from './data';
 
 export const API = 'http://localhost/api/v1';
 
@@ -38,6 +38,27 @@ function treeList(items: MockResource[]) {
   });
 }
 
+/** 상세 경로. Namespace는 nodeId가 없으면 Pod가 있는 최소 ID Node를 쓴다 */
+function path(item: MockResource, nodeIdParam?: number) {
+  const segment = (r: MockResource) => ({ resourceType: r.resourceType, id: r.id, name: r.name });
+  const cluster = findResource('CLUSTER', item.clusterId)!;
+  if (item.resourceType === 'CLUSTER') return [segment(item)];
+  if (item.resourceType === 'NODE') return [segment(cluster), segment(item)];
+  const nodeId =
+    item.resourceType === 'POD'
+      ? item.nodeId!
+      : (nodeIdParam ??
+        Math.min(...podsWhere((p) => p.namespaceId === item.id).map((p) => p.nodeId!)));
+  const node = findResource('NODE', nodeId)!;
+  if (item.resourceType === 'NAMESPACE') return [segment(cluster), segment(node), segment(item)];
+  return [
+    segment(cluster),
+    segment(node),
+    segment(findResource('NAMESPACE', item.namespaceId!)!),
+    segment(item),
+  ];
+}
+
 /************************************************************
  * 주소별 처리
  ************************************************************/
@@ -57,6 +78,25 @@ export const handlers = [
       ),
     ),
   ),
+  http.get(`${API}/resources/:type/:id`, ({ request, params }) => {
+    const item = findResource(params.type as MockResource['resourceType'], Number(params.id));
+    if (!item) {
+      return HttpResponse.json(
+        { code: 'RESOURCE_NOT_FOUND', message: '해당 리소스 또는 경로를 찾을 수 없습니다.' },
+        { status: 404 },
+      );
+    }
+    const nodeId = new URL(request.url).searchParams.get('nodeId');
+    return HttpResponse.json({
+      resource: {
+        ...treeItem(item),
+        issueReason: item.issueLevel === 'NONE' ? null : `${item.issueLevel} 사유`,
+        path: path(item, nodeId === null ? undefined : Number(nodeId)),
+        attributes: { sample: 'value' },
+      },
+      fetchedAt: now(),
+    });
+  }),
 ];
 
 export const server = setupServer(...handlers);
