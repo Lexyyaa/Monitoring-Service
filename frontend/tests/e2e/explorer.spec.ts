@@ -13,6 +13,7 @@ import {
   row,
   searchInput,
   searchPanel,
+  tree,
   waitTreeIdle,
 } from './helpers';
 
@@ -79,6 +80,18 @@ test.describe('성공 케이스', () => {
       'ns-01-001',
       ERROR_POD,
     ]);
+  });
+
+  test('FILTER-T05 실제 데이터에서 검색어와 필터를 함께 적용한다', async ({ page }) => {
+    await page.goto('/');
+    await page.getByLabel('트리·검색 심각도').selectOption('ERROR');
+
+    await searchInput(page).fill('api');
+
+    const results = searchPanel(page).locator('button.search-result');
+    await expect(results).toHaveCount(1);
+    await expect(results.first()).toContainText(ERROR_POD);
+    await expect(tree(page).locator('.match-role').first()).toHaveText('PATH');
   });
 });
 

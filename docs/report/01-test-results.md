@@ -73,3 +73,9 @@
 - FILTER-T02, T05, T06, T09: 통합 테스트 통과 (`ResourceApiIntegrationTest`)
 - PATH 근거: Pod가 없는 ERROR Namespace만 있는 Cluster는 ERROR 필터 결과에 나오지 않는다 (`ResourceTreeRepositoryIntegrationTest`)
 - 필터를 건 트리 조회는 로컬에서 4~31ms였다.
+
+## 필터 화면
+
+- FILTER-T01, T03, T04, T05, T07, T08과 필터 불일치 안내: 컴포넌트 테스트 통과 (`filter.test.tsx`)
+- FILTER-T05: E2E 통과. 실제 데이터에서 `api` + ERROR는 `pod-payment-api-error` 1건이다.
+- 필터 불일치 안내는 선택 당시가 아니라 현재 트리 행의 MATCH·PATH로 판단한다. 전체에서 고른 Cluster가 ERROR 필터에서 PATH이면 안내를 띄우지 않는다.
