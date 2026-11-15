@@ -67,3 +67,9 @@
 
 - SEARCH-T01, T05 ~ T08, UX-T02: 컴포넌트 테스트 통과 (`search.test.tsx`)
 - SEARCH-T05: E2E 통과. 실제 데이터에서 결과를 고르면 경로가 열리고 선택한 행이 화면 안에 보인다.
+
+## 필터 API
+
+- FILTER-T02, T05, T06, T09: 통합 테스트 통과 (`ResourceApiIntegrationTest`)
+- PATH 근거: Pod가 없는 ERROR Namespace만 있는 Cluster는 ERROR 필터 결과에 나오지 않는다 (`ResourceTreeRepositoryIntegrationTest`)
+- 필터를 건 트리 조회는 로컬에서 4~31ms였다.

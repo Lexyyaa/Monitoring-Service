@@ -204,4 +204,64 @@ class ResourceApiIntegrationTest {
                 .andExpect(status().isOk())
                 .andExpect(jsonPath("$.items.length()").value(0));
     }
+
+    /************************************************************
+     * 필터 : 시드에서 Cluster 1·Node 1·Namespace 1은 NONE, Pod 1만 ERROR
+     *        Namespace 177은 자기만 UNKNOWN(Node 18, UNKNOWN Pod 없음)
+     ************************************************************/
+    @Test
+    @DisplayName("FILTER-T02 ERROR 필터에서 정상 부모는 PATH, 오류 Pod는 MATCH다")
+    void filterMatchAndPath() throws Exception {
+        mockMvc.perform(get(API + "/clusters?issueLevel=ERROR"))
+                .andExpect(jsonPath("$.items[?(@.id == 1)].issueLevel").value("NONE"))
+                .andExpect(jsonPath("$.items[?(@.id == 1)].matchRole").value("PATH"));
+        mockMvc.perform(get(API + "/clusters/1/nodes?issueLevel=ERROR"))
+                .andExpect(jsonPath("$.items[?(@.id == 1)].matchRole").value("PATH"));
+        mockMvc.perform(get(API + "/nodes/1/namespaces?issueLevel=ERROR"))
+                .andExpect(jsonPath("$.items[?(@.id == 1)].matchRole").value("PATH"));
+        mockMvc.perform(get(API + "/nodes/1/namespaces/1/pods?issueLevel=ERROR"))
+                .andExpect(jsonPath("$.items.length()").value(1))
+                .andExpect(jsonPath("$.items[0].id").value(1))
+                .andExpect(jsonPath("$.items[0].matchRole").value("MATCH"));
+    }
+
+    @Test
+    @DisplayName("FILTER-T05 검색어와 필터를 함께 쓰면 둘 다 만족하는 리소스만 나온다")
+    void searchAndFilter() throws Exception {
+        mockMvc.perform(get(API + "/resources/search").param("q", "api").param("issueLevel", "ERROR"))
+                .andExpect(status().isOk())
+                .andExpect(jsonPath("$.items.length()").value(1))
+                .andExpect(jsonPath("$.items[0].name").value("pod-payment-api-error"));
+        mockMvc.perform(get(API + "/resources/search").param("q", "api").param("issueLevel", "WARNING"))
+                .andExpect(jsonPath("$.items[0].name").value("pod-worker-API-warn"));
+    }
+
+    @Test
+    @DisplayName("FILTER-T06 다른 Node의 오류 Pod 때문에 공유 Namespace가 잘못 노출되지 않는다")
+    void sharedNamespaceFilterPerNode() throws Exception {
+        jdbcTemplate.update("UPDATE pods SET node_id = 2 WHERE id = 1");
+
+        mockMvc.perform(get(API + "/nodes/2/namespaces?issueLevel=ERROR"))
+                .andExpect(jsonPath("$.items[?(@.id == 1)].matchRole").value("PATH"));
+        mockMvc.perform(get(API + "/nodes/1/namespaces?issueLevel=ERROR"))
+                .andExpect(jsonPath("$.items[?(@.id == 1)]").isEmpty());
+    }
+
+    @Test
+    @DisplayName("FILTER-T09 자기만 일치하는 Namespace는 MATCH이고 그 아래 Pod 목록은 비어 있다")
+    void selfMatchWithoutMatchingChildren() throws Exception {
+        mockMvc.perform(get(API + "/nodes/18/namespaces?issueLevel=UNKNOWN"))
+                .andExpect(jsonPath("$.items[?(@.id == 177)].matchRole").value("MATCH"));
+        mockMvc.perform(get(API + "/nodes/18/namespaces/177/pods?issueLevel=UNKNOWN"))
+                .andExpect(status().isOk())
+                .andExpect(jsonPath("$.items.length()").value(0));
+    }
+
+    @Test
+    @DisplayName("정의되지 않은 심각도 필터는 400")
+    void undefinedIssueLevel() throws Exception {
+        expectError(
+                mockMvc.perform(get(API + "/clusters?issueLevel=CRITICAL")).andExpect(status().isBadRequest()),
+                "INVALID_PARAMETER");
+    }
 }
