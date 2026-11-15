@@ -1,6 +1,6 @@
 /************************************************************************
  * 백엔드 Gradle 빌드 설정
- * Java 21, Spring Boot 3.5.16
+ * Java 21, Spring Boot 3.5.16, Web·JPA(Hibernate)·PostgreSQL 의존성
  ************************************************************************/
 
 plugins {
@@ -26,6 +26,8 @@ repositories {
 
 dependencies {
     implementation 'org.springframework.boot:spring-boot-starter-web'
+    implementation 'org.springframework.boot:spring-boot-starter-data-jpa'
+    runtimeOnly 'org.postgresql:postgresql'
     testImplementation 'org.springframework.boot:spring-boot-starter-test'
     testRuntimeOnly 'org.junit.platform:junit-platform-launcher'
 }
