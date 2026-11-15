@@ -79,3 +79,4 @@
 - FILTER-T01, T03, T04, T05, T07, T08과 필터 불일치 안내: 컴포넌트 테스트 통과 (`filter.test.tsx`)
 - FILTER-T05: E2E 통과. 실제 데이터에서 `api` + ERROR는 `pod-payment-api-error` 1건이다.
 - 필터 불일치 안내는 선택 당시가 아니라 현재 트리 행의 MATCH·PATH로 판단한다. 전체에서 고른 Cluster가 ERROR 필터에서 PATH이면 안내를 띄우지 않는다.
+- DB-08(검색·필터): 검색은 DB에서 정렬하고 `LIMIT 21`로 읽는다. 필터는 `EXISTS` 조건으로 DB에서 판단한다. Java에서 Pod 전체를 순회하지 않는다.
