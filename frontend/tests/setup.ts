@@ -1,11 +1,12 @@
 /************************************************************************
  * 단위·컴포넌트 테스트 공통 준비
- * 화면 검사용 matcher를 등록하고, 테스트마다 가짜 API 서버를 초기 상태로 되돌린다
+ * 화면 검사용 matcher를 등록하고, 테스트마다 가짜 API 서버와 데이터를 초기 상태로 되돌린다
  ************************************************************************/
 
 import '@testing-library/jest-dom/vitest';
 import { cleanup } from '@testing-library/react';
 import { afterAll, afterEach, beforeAll, beforeEach, vi } from 'vitest';
+import { resetMockData } from './mocks/data';
 import { requestLog, server } from './mocks/server';
 
 /************************************************************
@@ -32,6 +33,7 @@ beforeAll(() => {
   globalThis.fetch = fetchWithoutDomSignal(globalThis.fetch);
 });
 beforeEach(() => {
+  resetMockData();
   requestLog.length = 0;
 });
 afterEach(() => {

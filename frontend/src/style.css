@@ -1,0 +1,500 @@
+:root {
+  --bg: #eaf4fc;
+  --surface: #ffffff;
+  --surface-raised: #f4f9fe;
+  --surface-hover: #eef6fd;
+  --border: #d3e5f5;
+  --border-soft: #e6f0f9;
+  --border-strong: #b9d5ee;
+  --text: #0f2a43;
+  --text-muted: #4f6b85;
+  --text-faint: #64748b;
+  --accent: #0284c7;
+  --accent-soft: #e0f2fe;
+  --selected: #dff1fd;
+  /* 흰 글자 대비 5.9:1 (WCAG AA 4.5:1 이상) */
+  --header-bg: #0369a1;
+  --header-text: #ffffff;
+  --shadow: 0 6px 20px #0c4a6e14;
+
+  --none: #15803d;
+  --none-soft: #dcfce7;
+  --warning: #b45309;
+  --warning-soft: #fef3c7;
+  --error: #dc2626;
+  --error-soft: #fee2e2;
+  --unknown: #64748b;
+  --unknown-soft: #eef2f6;
+
+  --header-height: 60px;
+  --detail-width: 420px;
+
+  font-family: Inter, system-ui, sans-serif;
+  color: var(--text);
+  background: var(--bg);
+  font-synthesis: none;
+  color-scheme: light;
+}
+* {
+  box-sizing: border-box;
+}
+body {
+  margin: 0;
+  min-width: 320px;
+  background: var(--bg);
+}
+button,
+input,
+select {
+  font: inherit;
+  color: inherit;
+}
+
+/************************************************************
+ * 상단 바 : 제목 · 심각도 필터 · 새로고침 · 마지막 성공 조회
+ ************************************************************/
+.app-header {
+  position: sticky;
+  top: 0;
+  z-index: 20;
+  display: flex;
+  align-items: center;
+  gap: 16px;
+  height: var(--header-height);
+  padding: 0 24px;
+  background: var(--header-bg);
+  color: var(--header-text);
+  box-shadow: 0 2px 10px #0369a133;
+}
+.app-title {
+  margin: 0 auto 0 0;
+  font-size: 16px;
+  font-weight: 700;
+  letter-spacing: 0.01em;
+}
+.app-title span {
+  font-weight: 500;
+  opacity: 0.85;
+}
+.filter-control {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  font-size: 13px;
+}
+.filter-control select {
+  min-width: 130px;
+  padding: 7px 10px;
+  border: 1px solid #ffffff99;
+  border-radius: 6px;
+  background: var(--surface);
+  color: var(--text);
+}
+.refresh-button,
+.detail-error button,
+.tree-panel [role='alert'] button,
+.load-more,
+.detail-close {
+  padding: 7px 14px;
+  border: 1px solid var(--border-strong);
+  border-radius: 6px;
+  background: var(--surface-raised);
+  cursor: pointer;
+}
+.load-more:hover,
+.detail-close:hover {
+  border-color: var(--accent);
+  color: var(--accent);
+}
+.app-header .refresh-button {
+  border-color: #ffffffb3;
+  background: #075985; /* 흰 글자 대비 7.6:1 */
+  color: var(--header-text);
+  font-weight: 600;
+}
+.app-header .refresh-button:hover {
+  background: #0c4a6e;
+}
+.refresh-button:disabled {
+  cursor: wait;
+  opacity: 0.7;
+}
+.last-fetch {
+  min-width: 170px;
+  font-size: 12px;
+  opacity: 0.9;
+}
+
+/************************************************************
+ * 본문 : 상세 패널이 열리면 패널 너비만큼 오른쪽 여백을 줘 가리지 않게 한다
+ ************************************************************/
+.explorer-layout {
+  display: grid;
+  gap: 16px;
+  max-width: 1400px;
+  margin: 0 auto;
+  padding: 20px 24px 40px;
+  transition: padding-right 0.22s ease;
+}
+.explorer-layout.with-detail {
+  padding-right: calc(var(--detail-width) + 24px);
+}
+
+/************************************************************
+ * 검색
+ ************************************************************/
+.search-panel {
+  padding: 16px 20px;
+  border: 1px solid var(--border);
+  border-radius: 10px;
+  background: var(--surface);
+  box-shadow: var(--shadow);
+}
+.search-panel label {
+  display: block;
+  margin-bottom: 8px;
+  color: var(--text-muted);
+  font-size: 13px;
+  font-weight: 600;
+}
+.search-panel input {
+  width: 100%;
+  height: 40px;
+  padding: 0 12px;
+  border: 1px solid var(--border-strong);
+  border-radius: 7px;
+  background: var(--bg);
+}
+.search-panel input:focus,
+.filter-control select:focus {
+  outline: 2px solid var(--accent);
+  outline-offset: 1px;
+}
+.search-results {
+  display: grid;
+  gap: 2px;
+  max-height: 330px;
+  overflow-y: auto;
+  margin-top: 12px;
+}
+.search-summary {
+  padding: 6px 4px;
+  color: var(--text-faint);
+  font-size: 12px;
+}
+.search-result {
+  display: grid;
+  grid-template-columns: auto 1fr auto;
+  align-items: center;
+  gap: 6px 10px;
+  width: 100%;
+  padding: 9px 10px;
+  text-align: left;
+  border: 0;
+  border-radius: 7px;
+  background: transparent;
+  cursor: pointer;
+}
+.search-result:hover {
+  background: var(--surface-hover);
+}
+.search-result strong {
+  overflow: hidden;
+  text-overflow: ellipsis;
+  font-weight: 600;
+}
+.search-result small {
+  color: var(--text-faint);
+  font-size: 11px;
+}
+.search-path {
+  grid-column: 2 / 4;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+/************************************************************
+ * 트리
+ ************************************************************/
+.tree-panel {
+  border: 1px solid var(--border);
+  border-radius: 10px;
+  overflow: hidden;
+  background: var(--surface);
+  box-shadow: var(--shadow);
+}
+.tree-header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 16px 20px;
+  border-bottom: 1px solid var(--border);
+}
+.tree-header h2 {
+  margin: 0 0 4px;
+  font-size: 16px;
+}
+.tree-header p,
+.tree-header small,
+.tree-panel footer {
+  color: var(--text-faint);
+  font-size: 12px;
+}
+.tree-header p {
+  margin: 0;
+}
+.tree-panel [role='alert'] {
+  padding: 10px 20px;
+  border-bottom: 1px solid var(--border);
+  background: var(--error-soft);
+  color: var(--error);
+  font-size: 13px;
+}
+/* 가상 스크롤 계산(ResourceTree의 VIEWPORT_HEIGHT)과 높이를 맞춘다. 안쪽 여백을 두지 않는다 */
+.tree-viewport {
+  height: 600px;
+  overflow: auto;
+}
+.tree-row {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  padding-right: 18px;
+  border-bottom: 1px solid var(--border-soft);
+  white-space: nowrap;
+}
+.tree-row:hover {
+  background: var(--surface-hover);
+}
+.tree-row.selected {
+  background: var(--selected);
+  box-shadow: inset 3px 0 0 var(--accent);
+}
+.toggle,
+.resource-name,
+.retry {
+  border: 0;
+  background: transparent;
+  cursor: pointer;
+}
+.toggle {
+  width: 22px;
+  font-size: 15px;
+  color: var(--text-muted);
+}
+.toggle:disabled {
+  cursor: default;
+  color: var(--text-faint);
+}
+.resource-name {
+  overflow: hidden;
+  text-overflow: ellipsis;
+  text-align: left;
+  flex: 1;
+  min-width: 90px;
+  font-weight: 550;
+}
+.resource-name:hover {
+  color: var(--accent);
+}
+.status,
+.substate {
+  color: var(--text-muted);
+  font-size: 12px;
+}
+.retry {
+  color: var(--error);
+}
+.empty {
+  padding: 24px;
+  color: var(--text-faint);
+}
+.tree-empty {
+  display: flex;
+  align-items: center;
+  color: var(--text-faint);
+  font-size: 13px;
+}
+.tree-panel footer {
+  padding: 10px 20px;
+  border-top: 1px solid var(--border);
+}
+
+/************************************************************
+ * 심각도 배지와 필터 역할(MATCH/PATH)
+ ************************************************************/
+.issue {
+  border-radius: 99px;
+  padding: 2px 8px;
+  font-size: 11px;
+  font-weight: 700;
+  letter-spacing: 0.02em;
+}
+.issue.none {
+  background: var(--none-soft);
+  color: var(--none);
+}
+.issue.warning {
+  background: var(--warning-soft);
+  color: var(--warning);
+}
+.issue.error {
+  background: var(--error-soft);
+  color: var(--error);
+}
+.issue.unknown {
+  background: var(--unknown-soft);
+  color: var(--unknown);
+}
+.match-role {
+  padding: 2px 6px;
+  border: 1px solid var(--border-strong);
+  border-radius: 5px;
+  color: var(--text-muted);
+  font-size: 10px;
+  font-weight: 700;
+}
+.match-role.match {
+  border-color: var(--error);
+  color: var(--error);
+}
+.match-role.path {
+  color: var(--text-faint);
+}
+
+/************************************************************
+ * 상세 패널 : 화면 오른쪽에 붙어 있다가 선택하면 밀려 나온다
+ ************************************************************/
+.detail-panel {
+  position: fixed;
+  top: var(--header-height);
+  right: 0;
+  bottom: 0;
+  z-index: 10;
+  width: var(--detail-width);
+  overflow-y: auto;
+  padding: 20px 22px 28px;
+  border-left: 1px solid var(--border);
+  background: var(--surface);
+  box-shadow: -10px 0 28px #0c4a6e1f;
+  transform: translateX(100%);
+  transition: transform 0.22s ease;
+}
+.detail-panel.open {
+  transform: translateX(0);
+}
+.detail-header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  margin-bottom: 18px;
+}
+.detail-panel h2 {
+  margin: 0;
+  font-size: 15px;
+  color: var(--text-muted);
+}
+.detail-close {
+  padding: 4px 10px;
+}
+.detail-panel h3 {
+  margin: 22px 0 10px;
+  color: var(--text-muted);
+  font-size: 13px;
+}
+.detail-title {
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+}
+.detail-title strong {
+  font-size: 18px;
+  overflow-wrap: anywhere;
+}
+.resource-type {
+  color: var(--accent);
+  font-size: 11px;
+  font-weight: 700;
+  letter-spacing: 0.08em;
+}
+.detail-common {
+  display: grid;
+  grid-template-columns: 92px 1fr;
+  gap: 10px 8px;
+  margin: 18px 0;
+  padding: 14px;
+  border: 1px solid var(--border);
+  border-radius: 8px;
+  background: var(--surface-raised);
+  font-size: 13px;
+}
+.detail-common dt,
+.attributes dt {
+  color: var(--text-muted);
+}
+.detail-common dd,
+.attributes dd {
+  margin: 0;
+  overflow-wrap: anywhere;
+}
+.issue-reason {
+  padding: 10px 12px;
+  border-left: 3px solid var(--warning);
+  border-radius: 4px;
+  background: var(--warning-soft);
+  font-size: 13px;
+}
+.detail-path {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 6px;
+  margin: 0;
+  padding: 0;
+  list-style: none;
+  color: var(--text-muted);
+  font-size: 12px;
+}
+.detail-path li:not(:last-child)::after {
+  content: '›';
+  margin-left: 6px;
+  color: var(--text-faint);
+}
+.attributes {
+  display: grid;
+  gap: 8px;
+  margin: 0;
+  font-size: 13px;
+}
+.attributes > div {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 8px;
+  padding-bottom: 8px;
+  border-bottom: 1px solid var(--border);
+}
+.detail-error {
+  color: var(--error);
+}
+.filter-mismatch {
+  padding: 10px 12px;
+  border: 1px solid var(--warning);
+  border-radius: 7px;
+  background: var(--warning-soft);
+  color: var(--warning);
+  font-size: 13px;
+}
+
+@media (max-width: 850px) {
+  :root {
+    --detail-width: 100vw;
+  }
+  .explorer-layout.with-detail {
+    padding-right: 24px;
+  }
+  .app-header {
+    flex-wrap: wrap;
+    height: auto;
+    padding: 10px 16px;
+  }
+}

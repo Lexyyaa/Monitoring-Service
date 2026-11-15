@@ -22,7 +22,16 @@ Java 21, Node.js와 npm, Docker Desktop. 명령은 프로젝트 루트에서 시
    docker compose exec db createdb -U monitoring monitoring_test
    ```
 
-2. Backend를 실행한다. 주소는 `http://localhost:8080`이다.
+2. Backend를 한 번 실행해 Flyway가 스키마를 만든 뒤, 새 터미널의 프로젝트 루트에서 Mock 데이터를 적재하고 확인한다. 통합 테스트를 돌리려면 `monitoring_test`에도 같은 명령을 실행한다.
+
+   ```sh
+   docker compose exec -T db psql -X -U monitoring -d monitoring -v ON_ERROR_STOP=1 -1 -f /dev/stdin < scripts/seed.sql
+   docker compose exec -T db psql -X -U monitoring -d monitoring -v ON_ERROR_STOP=1 -f /dev/stdin < scripts/verify.sql
+   ```
+
+   `seed.sql`은 이미 있는 ID를 건너뛰므로 다시 실행해도 된다.
+
+3. Backend를 실행한다. 주소는 `http://localhost:8080`이다.
 
    ```sh
    cd backend
@@ -31,7 +40,7 @@ Java 21, Node.js와 npm, Docker Desktop. 명령은 프로젝트 루트에서 시
 
    Java 21이 자동 선택되지 않는 macOS에서는 `JAVA_HOME=$(/usr/libexec/java_home -v 21) ./gradlew bootRun`을 쓴다. 다른 DB는 [환경 변수 예시](.env.example)의 `DB_URL`, `DB_USER`, `DB_PASSWORD`로 지정한다.
 
-3. Frontend를 실행한다. 주소는 `http://localhost:5173`이고, Vite가 `/api`를 Backend로 전달한다.
+4. Frontend를 실행한다. 주소는 `http://localhost:5173`이고, Vite가 `/api`를 Backend로 전달한다.
 
    ```sh
    cd frontend
