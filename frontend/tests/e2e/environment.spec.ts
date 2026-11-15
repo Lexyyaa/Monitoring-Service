@@ -5,7 +5,9 @@ test('실제 Chrome으로 화면을 연다', async ({ page }) => {
   await page.goto('/');
 
   await expect(
-    page.getByRole('heading', { name: 'Infrastructure Monitoring Service' }),
+    page
+      .getByRole('tree', { name: 'Kubernetes 리소스' })
+      .getByRole('button', { name: 'cluster-01', exact: true }),
   ).toBeVisible();
 });
 

@@ -1,13 +1,76 @@
 /************************************************************************
  * 가짜 API 서버 (MSW)
- * 실제 백엔드와 같은 주소로 응답한다. 기능별 응답은 기능을 구현할 때 handlers에 더한다
+ * 실제 백엔드와 같은 주소·응답 모양으로 트리를 돌려준다
  ************************************************************************/
 
+import { http, HttpResponse } from 'msw';
 import { setupServer } from 'msw/node';
+import { mockData, type MockResource } from './data';
 
 export const API = 'http://localhost/api/v1';
 
 /** 테스트에서 어떤 요청이 갔는지 확인하기 위한 기록 (경로 + 쿼리) */
 export const requestLog: string[] = [];
 
-export const server = setupServer();
+/************************************************************
+ * 응답 만들기
+ ************************************************************/
+const now = () => new Date().toISOString();
+const ofType = (type: MockResource['resourceType']) =>
+  mockData.filter((item) => item.resourceType === type);
+const podsWhere = (match: (pod: MockResource) => boolean) => ofType('POD').filter(match);
+
+function treeItem(item: MockResource) {
+  return {
+    id: item.id,
+    resourceType: item.resourceType,
+    name: item.name,
+    statusCode: item.statusCode,
+    issueLevel: item.issueLevel,
+    lastUpdatedAt: item.lastUpdatedAt,
+  };
+}
+
+function treeList(items: MockResource[]) {
+  return HttpResponse.json({
+    items: [...items].sort((a, b) => a.name.localeCompare(b.name)).map(treeItem),
+    fetchedAt: now(),
+  });
+}
+
+/************************************************************
+ * 주소별 처리
+ ************************************************************/
+export const handlers = [
+  http.get(`${API}/clusters`, () => treeList(ofType('CLUSTER'))),
+  http.get(`${API}/clusters/:clusterId/nodes`, ({ params }) =>
+    treeList(ofType('NODE').filter((n) => n.clusterId === Number(params.clusterId))),
+  ),
+  http.get(`${API}/nodes/:nodeId/namespaces`, ({ params }) => {
+    const pods = podsWhere((p) => p.nodeId === Number(params.nodeId));
+    return treeList(ofType('NAMESPACE').filter((ns) => pods.some((p) => p.namespaceId === ns.id)));
+  }),
+  http.get(`${API}/nodes/:nodeId/namespaces/:namespaceId/pods`, ({ params }) =>
+    treeList(
+      podsWhere(
+        (p) => p.nodeId === Number(params.nodeId) && p.namespaceId === Number(params.namespaceId),
+      ),
+    ),
+  ),
+];
+
+export const server = setupServer(...handlers);
+
+server.events.on('request:start', ({ request }) => {
+  const url = new URL(request.url);
+  requestLog.push(url.pathname.replace('/api/v1', '') + url.search);
+});
+
+/************************************************************
+ * 실패 주입 도우미
+ ************************************************************/
+export const unavailable = () =>
+  HttpResponse.json(
+    { code: 'SERVICE_UNAVAILABLE', message: '데이터를 일시적으로 조회할 수 없습니다.' },
+    { status: 503 },
+  );
