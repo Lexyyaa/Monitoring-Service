@@ -112,3 +112,4 @@
 - 격리 E2E 환경: [env.sh](../../scripts/e2e/env.sh)로 개발과 다른 Compose 프로젝트(`monitoring-e2e`)와 볼륨에 빌드한 이미지 세 개를 띄우고 시드를 적재했다. 세 서비스 healthy, `verify.sql` 통과.
   - DB 변경 테스트는 이 DB 컨테이너(`monitoring-e2e-db-1`)에만 접속했다.
 - 탐색·상세·검색·필터 E2E: 격리 환경의 nginx(13100)를 거쳐 TREE-T02, DETAIL-T01, SEARCH-T05, FILTER-T05, TREE-T09 5건 통과
+- DB 변경 갱신 E2E: 격리 환경에서 REFRESH-T01, T02, T04 3건 통과. 테스트가 바꾼 Pod 1, Node 2의 값은 끝에 되돌렸다(ERROR, NONE 확인).
