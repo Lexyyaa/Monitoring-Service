@@ -104,3 +104,5 @@
   - db, backend, frontend 로그에 오류 없음
 - 헬스체크: DB를 멈추면 `/actuator/health`가 503 `DOWN`, 다시 켜면 200 `UP`이었다. `/actuator/env`는 노출하지 않는다(404).
 - 이미지 크기: backend 392MB, frontend 76MB
+- nginx 경유 API: 트리 4종, 검색, 필터(트리·검색), Namespace·Pod 상세가 모두 200이었다.
+- nginx 경유 화면: 브라우저에서 탐색 → 상세 → 검색 → ERROR 필터 → 새로고침을 실행했다. API 요청은 모두 화면과 같은 출처(`localhost:13001/api/v1/...`)로 나갔고 오류 표시는 없었다. 새로고침은 Cluster 목록, 펼친 분기 2개, 현재 검색, 열린 상세 5건만 다시 요청했다.
