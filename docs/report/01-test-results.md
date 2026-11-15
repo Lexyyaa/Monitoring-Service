@@ -80,3 +80,7 @@
 - FILTER-T05: E2E 통과. 실제 데이터에서 `api` + ERROR는 `pod-payment-api-error` 1건이다.
 - 필터 불일치 안내는 선택 당시가 아니라 현재 트리 행의 MATCH·PATH로 판단한다. 전체에서 고른 Cluster가 ERROR 필터에서 PATH이면 안내를 띄우지 않는다.
 - DB-08(검색·필터): 검색은 DB에서 정렬하고 `LIMIT 21`로 읽는다. 필터는 `EXISTS` 조건으로 DB에서 판단한다. Java에서 Pod 전체를 순회하지 않는다.
+
+## 갱신과 신선도
+
+- 변경 시각과 조회 시각: 통합 테스트 통과. Pod 3의 `lastUpdatedAt`은 2026-10-01, `fetchedAt`은 요청 시각이며 둘 다 UTC(`Z`) 형식이다.
