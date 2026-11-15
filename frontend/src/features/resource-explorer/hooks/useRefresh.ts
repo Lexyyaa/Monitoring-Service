@@ -2,6 +2,7 @@ import { useQueryClient } from '@tanstack/react-query';
 import { useCallback, useEffect, useRef, useState } from 'react';
 
 const POLLING_INTERVAL_MS = 30_000;
+const SCROLL_IDLE_MS = 1_000;
 
 /** 단일 응답({fetchedAt}) 또는 검색 페이지 묶음({pages: [...]})에서 조회 시각을 꺼낸다 */
 function readFetchedAt(data: unknown): string | undefined {
@@ -16,6 +17,8 @@ function readFetchedAt(data: unknown): string | undefined {
  * 접은 분기와 닫은 상세는 활성 조회가 아니므로 요청하지 않는다. 별도 변경 API는 없다
  * 30초 폴링과 수동 새로고침이 같은 함수를 쓰고, 진행 중에는 버튼을 잠근다
  * 탭이 보이지 않을 때는 폴링을 건너뛴다
+ * 사용자가 스크롤하는 중이면 폴링을 스크롤이 멈추고 1초 뒤로 미룬다
+ * (분기 220개를 펼친 채 스크롤 중 폴링이 겹치면 그 1초가 16fps로 떨어졌다. 수동 새로고침은 미루지 않는다)
  ************************************************************/
 export function useRefresh() {
   const queryClient = useQueryClient();
@@ -35,11 +38,28 @@ export function useRefresh() {
   }, [queryClient]);
 
   useEffect(() => {
-    const timer = window.setInterval(() => {
+    let lastScrollAt = Number.NEGATIVE_INFINITY;
+    let deferTimer: number | undefined;
+    const onScroll = () => {
+      lastScrollAt = performance.now();
+    };
+    const poll = () => {
       if (document.visibilityState === 'hidden') return;
+      if (performance.now() - lastScrollAt < SCROLL_IDLE_MS) {
+        window.clearTimeout(deferTimer);
+        deferTimer = window.setTimeout(poll, SCROLL_IDLE_MS);
+        return;
+      }
       void refresh();
-    }, POLLING_INTERVAL_MS);
-    return () => window.clearInterval(timer);
+    };
+    // scroll 이벤트는 버블링되지 않으므로 캡처 단계에서 트리 영역의 스크롤까지 받는다
+    window.addEventListener('scroll', onScroll, { capture: true, passive: true });
+    const timer = window.setInterval(poll, POLLING_INTERVAL_MS);
+    return () => {
+      window.clearInterval(timer);
+      window.clearTimeout(deferTimer);
+      window.removeEventListener('scroll', onScroll, { capture: true });
+    };
   }, [refresh]);
 
   /** 성공한 응답의 서버 조회 시각 중 가장 최근 값을 보여 준다 (늦게 끝난 예전 요청이 시각을 되돌리지 않게) */

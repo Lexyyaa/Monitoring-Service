@@ -236,3 +236,24 @@ describe('늦은 응답과 갱신 충돌', () => {
     expect(filterSelect()).toHaveValue('WARNING');
   });
 });
+
+describe('스크롤 중 폴링', () => {
+  test('스크롤하는 동안에는 폴링을 미루고, 스크롤이 멈추면 1초 뒤에 갱신한다', async () => {
+    vi.useFakeTimers({ shouldAdvanceTime: true });
+    renderApp({ advanceTimers: vi.advanceTimersByTime });
+    await waitForRow('cluster-01');
+    requestLog.length = 0;
+
+    await act(async () => {
+      vi.advanceTimersByTime(29_500);
+      tree().dispatchEvent(new Event('scroll'));
+      vi.advanceTimersByTime(600);
+    });
+    expect(requestLog).toHaveLength(0);
+
+    await act(async () => {
+      vi.advanceTimersByTime(1_000);
+    });
+    await vi.waitFor(() => expect(requestLog).toEqual(['/clusters']));
+  });
+});
