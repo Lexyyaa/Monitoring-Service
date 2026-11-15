@@ -63,6 +63,8 @@ HTTP 계약의 기준은 [OpenAPI](openapi.yaml)다.
 
 - `MATCH`: 리소스 자체가 필터에 일치
 - `PATH`: 일치하는 하위 리소스로 가는 경로
+  - 트리에서 펼쳐 도달할 수 있는 하위만 근거로 한다.
+  - Pod가 없는 Namespace는 트리에 나타나지 않으므로 Cluster의 `PATH` 근거가 아니다.
 - 필터가 없으면 `matchRole`을 생략한다.
 - Node 아래 Namespace는 Pod 관계로 찾고 중복을 제거한다.
   Node와 Namespace가 다른 Cluster에 있으면 Pod 목록은 `404`다.
@@ -131,6 +133,7 @@ HTTP 계약의 기준은 [OpenAPI](openapi.yaml)다.
 | --- | --- | --- |
 | 400 | `INVALID_PARAMETER` | 잘못된 ID·열거형·검색어·페이지·`nodeId` |
 | 404 | `RESOURCE_NOT_FOUND` | 없는 리소스 또는 잘못된 상하위 경로 |
+| 405 | `METHOD_NOT_ALLOWED` | GET 외의 HTTP 메서드 |
 | 500 | `INTERNAL_ERROR` | 예상하지 못한 서버 오류 |
 | 503 | `SERVICE_UNAVAILABLE` | DB 등 조회 의존 서비스 일시 불가 |
 

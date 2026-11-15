@@ -92,6 +92,9 @@
 - `(cluster_id, node_id)` → Node의 `(cluster_id, id)`.
 - `(cluster_id, namespace_id)` → Namespace의 `(cluster_id, id)`.
 - 초기 Mock에서는 모든 Pod에 Node를 배정한다.
+- 모든 Namespace는 Pod가 1개 이상 있어야 화면 경로를 가진다.
+  Pod가 없는 Namespace는 트리와 검색 결과에 나타나지 않고, 상세는 경로가 없어 `404`다.
+  시드는 모든 Namespace에 Pod를 둔다.
 
 V1은 삭제 시 `CASCADE`를 지정하지 않는다.
 
