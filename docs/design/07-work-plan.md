@@ -47,7 +47,7 @@
 
 관련 문서: [데이터 모델](03-data-model.md), [트리와 상세 API](04-api-spec.md), [DB, TREE, DETAIL 시나리오](06-test-scenarios.md).
 
-- [ ] **P01-01** `feat: 네 리소스 엔티티와 상태 코드 정의`
+- [x] **P01-01** `feat: 네 리소스 엔티티와 상태 코드 정의`
   - 완료: Cluster, Node, Namespace, Pod의 필드와 상태 규칙을 구현하고 핵심 규칙을 단위 테스트한다.
 - [x] **P01-02** `feat: Flyway 리소스 스키마와 관계 제약 추가`
   - 완료: PK, FK, UNIQUE, CHECK, Pod의 Cluster 일치 복합 FK가 새 DB에 적용된다.

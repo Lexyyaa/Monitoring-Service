@@ -1,6 +1,6 @@
 /************************************************************************
  * 백엔드 Gradle 빌드 설정
- * Java 21, Spring Boot 3.5.16, Web·JPA(Hibernate)·Flyway·PostgreSQL 의존성
+ * Java 21, Spring Boot 3.5.16, Web·JPA(Hibernate)·Lombok·Flyway·PostgreSQL 의존성
  ************************************************************************/
 
 plugins {
@@ -27,6 +27,8 @@ repositories {
 dependencies {
     implementation 'org.springframework.boot:spring-boot-starter-web'
     implementation 'org.springframework.boot:spring-boot-starter-data-jpa'
+    compileOnly 'org.projectlombok:lombok'
+    annotationProcessor 'org.projectlombok:lombok'
     implementation 'org.flywaydb:flyway-core'
     implementation 'org.flywaydb:flyway-database-postgresql'
     runtimeOnly 'org.postgresql:postgresql'
