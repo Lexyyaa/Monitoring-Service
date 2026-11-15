@@ -1,0 +1,37 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="1100" height="680" viewBox="0 0 1100 680" role="img" aria-label="데이터 소속 관계">
+<defs><marker id="arrow" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="8" markerHeight="8" orient="auto-start-reverse"><path d="M0 0 L10 5 L0 10 Z" fill="#475569"/></marker></defs>
+<rect width="100%" height="100%" fill="#f8fafc"/>
+<text x="40" y="52" font-family="Apple SD Gothic Neo, Pretendard, sans-serif" font-size="28" font-weight="700" fill="#0f172a">데이터 소속 관계</text>
+<text x="40" y="82" font-family="Apple SD Gothic Neo, Pretendard, sans-serif" font-size="15" fill="#475569">실제 DB 관계 — 화면 탐색 경로와 구분</text>
+<path d="M470 215 L290 290" fill="none" stroke="#475569" stroke-width="2.5" marker-end="url(#arrow)"/>
+<text x="350" y="250" text-anchor="middle" font-family="Apple SD Gothic Neo, Pretendard, sans-serif" font-size="13" fill="#334155">cluster_id</text>
+<path d="M630 215 L810 290" fill="none" stroke="#475569" stroke-width="2.5" marker-end="url(#arrow)"/>
+<text x="750" y="250" text-anchor="middle" font-family="Apple SD Gothic Neo, Pretendard, sans-serif" font-size="13" fill="#334155">cluster_id</text>
+<path d="M550 215 L550 480" fill="none" stroke="#475569" stroke-width="2.5" stroke-dasharray="8 5" marker-end="url(#arrow)"/>
+<text x="600" y="360" text-anchor="middle" font-family="Apple SD Gothic Neo, Pretendard, sans-serif" font-size="13" fill="#334155">cluster_id</text>
+<path d="M320 430 L465 480" fill="none" stroke="#475569" stroke-width="2.5" marker-end="url(#arrow)"/>
+<text x="320" y="466" text-anchor="middle" font-family="Apple SD Gothic Neo, Pretendard, sans-serif" font-size="13" fill="#334155">(cluster_id, node_id)</text>
+<path d="M780 430 L635 480" fill="none" stroke="#475569" stroke-width="2.5" marker-end="url(#arrow)"/>
+<text x="795" y="466" text-anchor="middle" font-family="Apple SD Gothic Neo, Pretendard, sans-serif" font-size="13" fill="#334155">(cluster_id, namespace_id)</text>
+<rect x="430" y="105" width="240" height="110" rx="14" fill="#e0f2fe" stroke="#0284c7" stroke-width="2"/>
+<text x="448" y="137" font-family="Apple SD Gothic Neo, Pretendard, sans-serif" font-size="20" font-weight="700" fill="#0f172a">Cluster</text>
+<text x="448" y="167" font-family="Apple SD Gothic Neo, Pretendard, sans-serif" font-size="15" fill="#334155">id PK</text>
+<text x="448" y="190" font-family="Apple SD Gothic Neo, Pretendard, sans-serif" font-size="15" fill="#334155">name · 상태 · 갱신 시각</text>
+<rect x="120" y="290" width="280" height="140" rx="14" fill="#ecfdf5" stroke="#059669" stroke-width="2"/>
+<text x="138" y="322" font-family="Apple SD Gothic Neo, Pretendard, sans-serif" font-size="20" font-weight="700" fill="#0f172a">Node</text>
+<text x="138" y="352" font-family="Apple SD Gothic Neo, Pretendard, sans-serif" font-size="15" fill="#334155">id PK · cluster_id FK</text>
+<text x="138" y="375" font-family="Apple SD Gothic Neo, Pretendard, sans-serif" font-size="15" fill="#334155">UNIQUE(cluster_id, id)</text>
+<text x="138" y="398" font-family="Apple SD Gothic Neo, Pretendard, sans-serif" font-size="15" fill="#334155">Ready · CPU/메모리/디스크</text>
+<rect x="700" y="290" width="280" height="140" rx="14" fill="#fef3c7" stroke="#d97706" stroke-width="2"/>
+<text x="718" y="322" font-family="Apple SD Gothic Neo, Pretendard, sans-serif" font-size="20" font-weight="700" fill="#0f172a">Namespace</text>
+<text x="718" y="352" font-family="Apple SD Gothic Neo, Pretendard, sans-serif" font-size="15" fill="#334155">id PK · cluster_id FK</text>
+<text x="718" y="375" font-family="Apple SD Gothic Neo, Pretendard, sans-serif" font-size="15" fill="#334155">UNIQUE(cluster_id, id)</text>
+<text x="718" y="398" font-family="Apple SD Gothic Neo, Pretendard, sans-serif" font-size="15" fill="#334155">Phase · CPU/메모리 쿼터</text>
+<rect x="430" y="480" width="240" height="130" rx="14" fill="#fce7f3" stroke="#db2777" stroke-width="2"/>
+<text x="448" y="512" font-family="Apple SD Gothic Neo, Pretendard, sans-serif" font-size="20" font-weight="700" fill="#0f172a">Pod</text>
+<text x="448" y="542" font-family="Apple SD Gothic Neo, Pretendard, sans-serif" font-size="15" fill="#334155">id PK · cluster_id FK</text>
+<text x="448" y="565" font-family="Apple SD Gothic Neo, Pretendard, sans-serif" font-size="15" fill="#334155">node_id / namespace_id</text>
+<text x="448" y="588" font-family="Apple SD Gothic Neo, Pretendard, sans-serif" font-size="15" fill="#334155">두 관계 모두 복합 FK</text>
+<rect x="75" y="630" width="950" height="34" rx="8" fill="#e2e8f0"/>
+<text x="550" y="653" text-anchor="middle" font-family="Apple SD Gothic Neo, Pretendard, sans-serif" font-size="15" fill="#0f172a">화면 경로: Cluster → Node → Namespace → Pod · Node → Namespace는 Pod 관계로 조회</text>
+</svg>
