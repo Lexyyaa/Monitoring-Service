@@ -1,3 +1,4 @@
+import { useEffect, useRef } from 'react';
 import { useVirtualWindow } from '../../../shared/lib/useVirtualWindow';
 import type { ResourceTreeState } from '../hooks/useResourceTree';
 import ResourceTreeRow from './ResourceTreeRow';
@@ -22,6 +23,22 @@ export default function ResourceTree({ tree, selectedKey }: ResourceTreeProps) {
     overscan: OVERSCAN_ROWS,
   });
 
+  const alertMessage = tree.rootError ?? tree.navigationError;
+
+  /************************************************************
+   * 검색 결과로 연 행이 화면 밖이면 그 행이 가운데 오도록 스크롤 (요청마다 한 번)
+   ************************************************************/
+  const revealedId = useRef<number | undefined>(undefined);
+  const { revealRequest } = tree;
+  const { scrollToIndex } = view;
+  useEffect(() => {
+    if (!revealRequest || revealRequest.id === revealedId.current) return;
+    const index = rows.findIndex((row) => row.key === revealRequest.key);
+    if (index < 0) return;
+    revealedId.current = revealRequest.id;
+    scrollToIndex(index);
+  }, [revealRequest, rows, scrollToIndex]);
+
   return (
     <section className="tree-panel" aria-label="리소스 트리">
       <header className="tree-header">
@@ -31,9 +48,9 @@ export default function ResourceTree({ tree, selectedKey }: ResourceTreeProps) {
         </div>
         {tree.fetchedAt && <small>조회 {new Date(tree.fetchedAt).toLocaleTimeString()}</small>}
       </header>
-      {tree.rootError && (
+      {alertMessage && (
         <div role="alert">
-          {tree.rootError} <button onClick={tree.retryRoot}>다시 시도</button>
+          {alertMessage} {tree.rootError && <button onClick={tree.retryRoot}>다시 시도</button>}
         </div>
       )}
       <div
@@ -56,7 +73,7 @@ export default function ResourceTree({ tree, selectedKey }: ResourceTreeProps) {
             onRetry={tree.retry}
           />
         ))}
-        {rows.length === 0 && !tree.rootError && !tree.isFetching && (
+        {rows.length === 0 && !alertMessage && !tree.isFetching && (
           <p className="empty">표시할 Cluster가 없습니다.</p>
         )}
         {rows.length === 0 && tree.isFetching && <p className="empty">불러오는 중…</p>}

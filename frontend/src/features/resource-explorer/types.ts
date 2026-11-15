@@ -1,5 +1,8 @@
 export type ResourceType = 'CLUSTER' | 'NODE' | 'NAMESPACE' | 'POD';
 export type IssueLevel = 'NONE' | 'WARNING' | 'ERROR' | 'UNKNOWN';
+export type MatchRole = 'MATCH' | 'PATH';
+
+export const ISSUE_LEVELS: readonly IssueLevel[] = ['NONE', 'WARNING', 'ERROR', 'UNKNOWN'];
 
 /************************************************************
  * 서버 응답
@@ -11,6 +14,8 @@ export interface TreeItem {
   statusCode: string;
   issueLevel: IssueLevel;
   lastUpdatedAt: string;
+  /** 필터가 있을 때만 온다 */
+  matchRole?: MatchRole;
 }
 
 export interface TreeResponse {
@@ -22,6 +27,18 @@ export interface PathSegment {
   resourceType: ResourceType;
   id: number;
   name: string;
+}
+
+export interface SearchItem extends TreeItem {
+  path: PathSegment[];
+}
+
+export interface SearchResponse {
+  items: SearchItem[];
+  page: number;
+  pageSize: number;
+  hasNext: boolean;
+  fetchedAt: string;
 }
 
 export interface ResourceDetail {

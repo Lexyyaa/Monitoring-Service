@@ -3,6 +3,7 @@ package com.ocs.monitoring.presentation.controller.resource;
 import com.ocs.monitoring.application.resource.ResourceApplicationService;
 import com.ocs.monitoring.application.resource.ResourceCommand;
 import jakarta.validation.constraints.Positive;
+import jakarta.validation.constraints.PositiveOrZero;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.MediaType;
 import org.springframework.web.bind.annotation.GetMapping;
@@ -20,29 +21,47 @@ public class ResourceController {
 
     /************************************************************
      * 트리 탐색 (Cluster → Node → Namespace → Pod). 경로 ID는 1 이상
+     * issueLevel이 없으면 전체, 있으면 MATCH·PATH 항목만
      ************************************************************/
     @GetMapping("/clusters")
-    public ResourceResponse.TreeList listClusters() {
-        return ResourceResponse.TreeList.from(resourceApplicationService.listClusters());
+    public ResourceResponse.TreeList listClusters(@RequestParam(required = false) String issueLevel) {
+        ResourceCommand.Clusters command = new ResourceCommand.Clusters(issueLevel);
+        return ResourceResponse.TreeList.from(resourceApplicationService.listClusters(command));
     }
 
     @GetMapping("/clusters/{clusterId}/nodes")
-    public ResourceResponse.TreeList listNodes(@PathVariable @Positive long clusterId) {
-        ResourceCommand.Nodes command = new ResourceCommand.Nodes(clusterId);
+    public ResourceResponse.TreeList listNodes(
+            @PathVariable @Positive long clusterId, @RequestParam(required = false) String issueLevel) {
+        ResourceCommand.Nodes command = new ResourceCommand.Nodes(clusterId, issueLevel);
         return ResourceResponse.TreeList.from(resourceApplicationService.listNodes(command));
     }
 
     @GetMapping("/nodes/{nodeId}/namespaces")
-    public ResourceResponse.TreeList listNamespaces(@PathVariable @Positive long nodeId) {
-        ResourceCommand.Namespaces command = new ResourceCommand.Namespaces(nodeId);
+    public ResourceResponse.TreeList listNamespaces(
+            @PathVariable @Positive long nodeId, @RequestParam(required = false) String issueLevel) {
+        ResourceCommand.Namespaces command = new ResourceCommand.Namespaces(nodeId, issueLevel);
         return ResourceResponse.TreeList.from(resourceApplicationService.listNamespaces(command));
     }
 
     @GetMapping("/nodes/{nodeId}/namespaces/{namespaceId}/pods")
     public ResourceResponse.TreeList listPods(
-            @PathVariable @Positive long nodeId, @PathVariable @Positive long namespaceId) {
-        ResourceCommand.Pods command = new ResourceCommand.Pods(nodeId, namespaceId);
+            @PathVariable @Positive long nodeId,
+            @PathVariable @Positive long namespaceId,
+            @RequestParam(required = false) String issueLevel) {
+        ResourceCommand.Pods command = new ResourceCommand.Pods(nodeId, namespaceId, issueLevel);
         return ResourceResponse.TreeList.from(resourceApplicationService.listPods(command));
+    }
+
+    /************************************************************
+     * 전체 이름 검색 (q는 앞뒤 공백을 지우고 1~200자, page는 0부터, issueLevel과 AND)
+     ************************************************************/
+    @GetMapping("/resources/search")
+    public ResourceResponse.SearchPage search(
+            @RequestParam String q,
+            @RequestParam(required = false) String issueLevel,
+            @RequestParam(defaultValue = "0") @PositiveOrZero int page) {
+        ResourceCommand.Search command = new ResourceCommand.Search(q, issueLevel, page);
+        return ResourceResponse.SearchPage.from(resourceApplicationService.search(command));
     }
 
     /************************************************************

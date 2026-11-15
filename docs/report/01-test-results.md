@@ -56,3 +56,27 @@
 - DETAIL-T01 ~ T03, T07과 닫기 동작: 컴포넌트 테스트 통과 (`detail.test.tsx`)
 - DETAIL-T01: E2E 통과. 실제 데이터로 네 종류 상세와 경로를 확인했다.
 - DETAIL-T04: API 통합 테스트로 확인했다. 트리에서 고르면 항상 클릭한 Node를 함께 보낸다.
+
+## 검색 API
+
+- UNIT-04: 단위 테스트 통과. 21건을 읽어 20건만 돌려주고 `hasNext`를 판단한다.
+- SEARCH-T03, T09, T11: 통합 테스트 통과 (`ResourceApiIntegrationTest`)
+  - 검색어는 앞뒤 공백을 지운 뒤 길이를 본다. 공백을 붙인 200자 검색어도 200이다.
+
+## 검색 화면
+
+- SEARCH-T01, T05 ~ T08, UX-T02: 컴포넌트 테스트 통과 (`search.test.tsx`)
+- SEARCH-T05: E2E 통과. 실제 데이터에서 결과를 고르면 경로가 열리고 선택한 행이 화면 안에 보인다.
+
+## 필터 API
+
+- FILTER-T02, T05, T06, T09: 통합 테스트 통과 (`ResourceApiIntegrationTest`)
+- PATH 근거: Pod가 없는 ERROR Namespace만 있는 Cluster는 ERROR 필터 결과에 나오지 않는다 (`ResourceTreeRepositoryIntegrationTest`)
+- 필터를 건 트리 조회는 로컬에서 4~31ms였다.
+
+## 필터 화면
+
+- FILTER-T01, T03, T04, T05, T07, T08과 필터 불일치 안내: 컴포넌트 테스트 통과 (`filter.test.tsx`)
+- FILTER-T05: E2E 통과. 실제 데이터에서 `api` + ERROR는 `pod-payment-api-error` 1건이다.
+- 필터 불일치 안내는 선택 당시가 아니라 현재 트리 행의 MATCH·PATH로 판단한다. 전체에서 고른 Cluster가 ERROR 필터에서 PATH이면 안내를 띄우지 않는다.
+- DB-08(검색·필터): 검색은 DB에서 정렬하고 `LIMIT 21`로 읽는다. 필터는 `EXISTS` 조건으로 DB에서 판단한다. Java에서 Pod 전체를 순회하지 않는다.

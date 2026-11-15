@@ -1,6 +1,8 @@
 package com.ocs.monitoring.application.resource;
 
 import com.ocs.monitoring.domain.resource.ResourceDetail;
+import com.ocs.monitoring.domain.resource.ResourceSearchItem;
+import com.ocs.monitoring.domain.resource.ResourceSearchPage;
 import com.ocs.monitoring.domain.resource.TreeResource;
 import java.time.Instant;
 import java.util.List;
@@ -22,7 +24,13 @@ public final class ResourceInfo {
     }
 
     public record TreeItem(
-            long id, String resourceType, String name, String statusCode, String issueLevel, Instant lastUpdatedAt) {
+            long id,
+            String resourceType,
+            String name,
+            String statusCode,
+            String issueLevel,
+            Instant lastUpdatedAt,
+            String matchRole) {
 
         public static TreeItem from(TreeResource resource) {
             return new TreeItem(
@@ -31,7 +39,8 @@ public final class ResourceInfo {
                     resource.name(),
                     resource.statusCode(),
                     resource.issueLevel().name(),
-                    resource.lastUpdatedAt());
+                    resource.lastUpdatedAt(),
+                    resource.matchRole() == null ? null : resource.matchRole().name());
         }
     }
 
@@ -81,6 +90,42 @@ public final class ResourceInfo {
                     detail.lastUpdatedAt(),
                     PathSegment.fromAll(detail.path()),
                     detail.attributes());
+        }
+    }
+
+    /************************************************************
+     * 검색 페이지
+     ************************************************************/
+    public record SearchPage(List<SearchItem> items, int page, int pageSize, boolean hasNext, Instant fetchedAt) {
+
+        public static SearchPage of(ResourceSearchPage result, int page, int pageSize, Instant fetchedAt) {
+            return new SearchPage(
+                    result.items().stream().map(SearchItem::from).toList(),
+                    page,
+                    pageSize,
+                    result.hasNext(),
+                    fetchedAt);
+        }
+    }
+
+    public record SearchItem(
+            long id,
+            String resourceType,
+            String name,
+            String statusCode,
+            String issueLevel,
+            Instant lastUpdatedAt,
+            List<PathSegment> path) {
+
+        public static SearchItem from(ResourceSearchItem item) {
+            return new SearchItem(
+                    item.id(),
+                    item.resourceType().name(),
+                    item.name(),
+                    item.statusCode(),
+                    item.issueLevel().name(),
+                    item.lastUpdatedAt(),
+                    PathSegment.fromAll(item.path()));
         }
     }
 }

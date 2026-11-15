@@ -4,6 +4,7 @@
  ************************************************************************/
 package com.ocs.monitoring.support.exception;
 
+import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.BDDMockito.given;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.get;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.content;
@@ -34,7 +35,7 @@ class GlobalExceptionHandlerTest {
     @Test
     @DisplayName("UNIT-05 조회 중이나 트랜잭션 시작 때 DB 연결이 실패하면 503")
     void dbFailureIs503() throws Exception {
-        given(resourceApplicationService.listClusters())
+        given(resourceApplicationService.listClusters(any()))
                 .willThrow(new DataAccessResourceFailureException("db down"))
                 .willThrow(new CannotCreateTransactionException("no connection"));
 
@@ -48,7 +49,7 @@ class GlobalExceptionHandlerTest {
     @Test
     @DisplayName("UNIT-06 예상하지 못한 오류는 내부 메시지 없이 500")
     void unexpectedErrorIs500() throws Exception {
-        given(resourceApplicationService.listClusters()).willThrow(new IllegalStateException("secret bug"));
+        given(resourceApplicationService.listClusters(any())).willThrow(new IllegalStateException("secret bug"));
 
         mockMvc.perform(get("/api/v1/clusters"))
                 .andExpect(status().isInternalServerError())

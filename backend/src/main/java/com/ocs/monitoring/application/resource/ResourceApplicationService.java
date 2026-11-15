@@ -1,7 +1,9 @@
 package com.ocs.monitoring.application.resource;
 
+import com.ocs.monitoring.domain.resource.IssueLevel;
 import com.ocs.monitoring.domain.resource.ResourceService;
 import com.ocs.monitoring.domain.resource.ResourceType;
+import com.ocs.monitoring.domain.resource.SearchPageRequest;
 import java.time.Instant;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
@@ -18,21 +20,34 @@ public class ResourceApplicationService {
 
     private final ResourceService resourceService;
 
-    public ResourceInfo.TreeList listClusters() {
-        return ResourceInfo.TreeList.of(resourceService.listClusters(), Instant.now());
+    public ResourceInfo.TreeList listClusters(ResourceCommand.Clusters command) {
+        IssueLevel filter = IssueLevel.from(command.issueLevel());
+        return ResourceInfo.TreeList.of(resourceService.listClusters(filter), Instant.now());
     }
 
     public ResourceInfo.TreeList listNodes(ResourceCommand.Nodes command) {
-        return ResourceInfo.TreeList.of(resourceService.listNodes(command.clusterId()), Instant.now());
+        IssueLevel filter = IssueLevel.from(command.issueLevel());
+        return ResourceInfo.TreeList.of(resourceService.listNodes(command.clusterId(), filter), Instant.now());
     }
 
     public ResourceInfo.TreeList listNamespaces(ResourceCommand.Namespaces command) {
-        return ResourceInfo.TreeList.of(resourceService.listNamespaces(command.nodeId()), Instant.now());
+        IssueLevel filter = IssueLevel.from(command.issueLevel());
+        return ResourceInfo.TreeList.of(resourceService.listNamespaces(command.nodeId(), filter), Instant.now());
     }
 
     public ResourceInfo.TreeList listPods(ResourceCommand.Pods command) {
+        IssueLevel filter = IssueLevel.from(command.issueLevel());
         return ResourceInfo.TreeList.of(
-                resourceService.listPods(command.nodeId(), command.namespaceId()), Instant.now());
+                resourceService.listPods(command.nodeId(), command.namespaceId(), filter), Instant.now());
+    }
+
+    public ResourceInfo.SearchPage search(ResourceCommand.Search command) {
+        IssueLevel filter = IssueLevel.from(command.issueLevel());
+        return ResourceInfo.SearchPage.of(
+                resourceService.search(command.query(), filter, command.page()),
+                command.page(),
+                SearchPageRequest.PAGE_SIZE,
+                Instant.now());
     }
 
     public ResourceInfo.Detail getDetail(ResourceCommand.Detail command) {

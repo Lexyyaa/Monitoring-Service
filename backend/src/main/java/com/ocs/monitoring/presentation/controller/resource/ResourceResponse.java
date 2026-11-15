@@ -1,5 +1,6 @@
 package com.ocs.monitoring.presentation.controller.resource;
 
+import com.fasterxml.jackson.annotation.JsonInclude;
 import com.ocs.monitoring.application.resource.ResourceInfo;
 import java.time.Instant;
 import java.util.List;
@@ -20,8 +21,16 @@ public final class ResourceResponse {
         }
     }
 
+    /** 필터가 없으면 matchRole을 응답에서 뺀다 */
+    @JsonInclude(JsonInclude.Include.NON_NULL)
     public record TreeItem(
-            long id, String resourceType, String name, String statusCode, String issueLevel, Instant lastUpdatedAt) {
+            long id,
+            String resourceType,
+            String name,
+            String statusCode,
+            String issueLevel,
+            Instant lastUpdatedAt,
+            String matchRole) {
 
         public static TreeItem from(ResourceInfo.TreeItem info) {
             return new TreeItem(
@@ -30,7 +39,8 @@ public final class ResourceResponse {
                     info.name(),
                     info.statusCode(),
                     info.issueLevel(),
-                    info.lastUpdatedAt());
+                    info.lastUpdatedAt(),
+                    info.matchRole());
         }
     }
 
@@ -42,6 +52,42 @@ public final class ResourceResponse {
 
         static List<PathSegment> fromAll(List<ResourceInfo.PathSegment> infos) {
             return infos.stream().map(PathSegment::from).toList();
+        }
+    }
+
+    /************************************************************
+     * 전체 검색 : GET /resources/search
+     ************************************************************/
+    public record SearchPage(List<SearchItem> items, int page, int pageSize, boolean hasNext, Instant fetchedAt) {
+
+        public static SearchPage from(ResourceInfo.SearchPage info) {
+            return new SearchPage(
+                    info.items().stream().map(SearchItem::from).toList(),
+                    info.page(),
+                    info.pageSize(),
+                    info.hasNext(),
+                    info.fetchedAt());
+        }
+    }
+
+    public record SearchItem(
+            long id,
+            String resourceType,
+            String name,
+            String statusCode,
+            String issueLevel,
+            Instant lastUpdatedAt,
+            List<PathSegment> path) {
+
+        public static SearchItem from(ResourceInfo.SearchItem info) {
+            return new SearchItem(
+                    info.id(),
+                    info.resourceType(),
+                    info.name(),
+                    info.statusCode(),
+                    info.issueLevel(),
+                    info.lastUpdatedAt(),
+                    PathSegment.fromAll(info.path()));
         }
     }
 

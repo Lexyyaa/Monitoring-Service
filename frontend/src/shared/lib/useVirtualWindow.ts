@@ -1,4 +1,4 @@
-import { useRef, useState, type UIEvent } from 'react';
+import { useCallback, useRef, useState, type UIEvent } from 'react';
 
 interface VirtualWindowOptions {
   count: number;
@@ -25,6 +25,16 @@ export function useVirtualWindow({
   const start = Math.max(0, firstVisible - overscan);
   const end = Math.min(count, firstVisible + visibleCount + overscan);
 
+  /** index번째 행이 화면 가운데에 오도록 스크롤한다 (검색 결과로 연 행 보여 주기) */
+  const scrollToIndex = useCallback(
+    (index: number) => {
+      const top = Math.max(0, index * rowHeight - viewportHeight / 2 + rowHeight / 2);
+      if (viewportRef.current) viewportRef.current.scrollTop = top;
+      setScrollTop(top);
+    },
+    [rowHeight, viewportHeight],
+  );
+
   return {
     start,
     end,
@@ -32,5 +42,6 @@ export function useVirtualWindow({
     spaceAfter: Math.max(0, (count - end) * rowHeight),
     viewportRef,
     onScroll: (event: UIEvent<HTMLElement>) => setScrollTop(event.currentTarget.scrollTop),
+    scrollToIndex,
   };
 }
