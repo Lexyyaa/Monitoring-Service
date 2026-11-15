@@ -261,7 +261,7 @@ components:
       in: query
       required: false
       description: |-
-        이상 심각도 직접 일치 조건. 프론트의 ALL 선택은 파라미터 생략으로 표현한다.
+        이상 심각도 직접 일치 조건. 화면의 전체 선택은 파라미터 생략으로 표현한다.
         트리에서는 일치 리소스뿐 아니라 해당 리소스에 도달하는 경로도 반환한다.
       schema: { $ref: '#/components/schemas/IssueLevel' }
       example: ERROR

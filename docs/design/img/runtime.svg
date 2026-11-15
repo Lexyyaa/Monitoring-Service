@@ -1,0 +1,69 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="1240" height="680" viewBox="0 0 1240 680" role="img" aria-label="실행 구성">
+<defs><marker id="arrow" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="8" markerHeight="8" orient="auto-start-reverse"><path d="M0 0 L10 5 L0 10 Z" fill="#475569"/></marker></defs>
+<rect width="100%" height="100%" fill="#f8fafc"/>
+<text x="40" y="52" font-family="Apple SD Gothic Neo, Pretendard, Noto Sans KR, sans-serif" font-size="28" font-weight="700" fill="#0f172a" text-anchor="start">실행 구성</text>
+<text x="40" y="82" font-family="Apple SD Gothic Neo, Pretendard, Noto Sans KR, sans-serif" font-size="14" font-weight="400" fill="#475569" text-anchor="start">같은 코드로 세 가지 방식으로 띄운다. 화면은 /api 요청을 프록시로 백엔드에 넘긴다.</text>
+<rect x="40" y="110" width="360" height="450" rx="10" fill="#ffffff" stroke="#7dd3fc" stroke-width="1.5"/>
+<rect x="40" y="110" width="360" height="64" rx="10" fill="#e0f2fe" stroke="#7dd3fc" stroke-width="1.5"/>
+<text x="220" y="138" font-family="Apple SD Gothic Neo, Pretendard, Noto Sans KR, sans-serif" font-size="17" font-weight="700" fill="#0f172a" text-anchor="middle">로컬 개발</text>
+<text x="220" y="160" font-family="Apple SD Gothic Neo, Pretendard, Noto Sans KR, sans-serif" font-size="12" font-weight="400" fill="#475569" text-anchor="middle">docker compose up -d db</text>
+<rect x="70" y="196" width="300" height="96" rx="10" fill="#ffffff" stroke="#cbd5e1" stroke-width="1.5"/>
+<text x="90" y="226" font-family="Apple SD Gothic Neo, Pretendard, Noto Sans KR, sans-serif" font-size="15" font-weight="700" fill="#0f172a" text-anchor="start">Vite 개발 서버</text>
+<text x="90" y="250" font-family="Apple SD Gothic Neo, Pretendard, Noto Sans KR, sans-serif" font-size="13" font-weight="700" fill="#0369a1" text-anchor="start">localhost:5173</text>
+<text x="90" y="272" font-family="Apple SD Gothic Neo, Pretendard, Noto Sans KR, sans-serif" font-size="12" font-weight="400" fill="#64748b" text-anchor="start">npm run dev, /api 프록시</text>
+<path d="M220 292 L220 318" fill="none" stroke="#475569" stroke-width="2" marker-end="url(#arrow)"/>
+<text x="230" y="310" font-family="Apple SD Gothic Neo, Pretendard, Noto Sans KR, sans-serif" font-size="11" font-weight="400" fill="#334155" text-anchor="start">/api/v1</text>
+<rect x="70" y="320" width="300" height="96" rx="10" fill="#ffffff" stroke="#cbd5e1" stroke-width="1.5"/>
+<text x="90" y="350" font-family="Apple SD Gothic Neo, Pretendard, Noto Sans KR, sans-serif" font-size="15" font-weight="700" fill="#0f172a" text-anchor="start">Spring Boot</text>
+<text x="90" y="374" font-family="Apple SD Gothic Neo, Pretendard, Noto Sans KR, sans-serif" font-size="13" font-weight="700" fill="#0369a1" text-anchor="start">localhost:8080</text>
+<text x="90" y="396" font-family="Apple SD Gothic Neo, Pretendard, Noto Sans KR, sans-serif" font-size="12" font-weight="400" fill="#64748b" text-anchor="start">./gradlew bootRun</text>
+<path d="M220 416 L220 442" fill="none" stroke="#475569" stroke-width="2" marker-end="url(#arrow)"/>
+<text x="230" y="434" font-family="Apple SD Gothic Neo, Pretendard, Noto Sans KR, sans-serif" font-size="11" font-weight="400" fill="#334155" text-anchor="start">SQL</text>
+<rect x="70" y="444" width="300" height="96" rx="10" fill="#ffffff" stroke="#cbd5e1" stroke-width="1.5"/>
+<text x="90" y="474" font-family="Apple SD Gothic Neo, Pretendard, Noto Sans KR, sans-serif" font-size="15" font-weight="700" fill="#0f172a" text-anchor="start">PostgreSQL 컨테이너</text>
+<text x="90" y="498" font-family="Apple SD Gothic Neo, Pretendard, Noto Sans KR, sans-serif" font-size="13" font-weight="700" fill="#0369a1" text-anchor="start">localhost:5432</text>
+<text x="90" y="520" font-family="Apple SD Gothic Neo, Pretendard, Noto Sans KR, sans-serif" font-size="12" font-weight="400" fill="#64748b" text-anchor="start">DB monitoring, monitoring_test</text>
+<rect x="440" y="110" width="360" height="450" rx="10" fill="#ffffff" stroke="#86efac" stroke-width="1.5"/>
+<rect x="440" y="110" width="360" height="64" rx="10" fill="#dcfce7" stroke="#86efac" stroke-width="1.5"/>
+<text x="620" y="138" font-family="Apple SD Gothic Neo, Pretendard, Noto Sans KR, sans-serif" font-size="17" font-weight="700" fill="#0f172a" text-anchor="middle">컨테이너 실행</text>
+<text x="620" y="160" font-family="Apple SD Gothic Neo, Pretendard, Noto Sans KR, sans-serif" font-size="12" font-weight="400" fill="#475569" text-anchor="middle">docker compose up -d --build --wait</text>
+<rect x="470" y="196" width="300" height="96" rx="10" fill="#ffffff" stroke="#cbd5e1" stroke-width="1.5"/>
+<text x="490" y="226" font-family="Apple SD Gothic Neo, Pretendard, Noto Sans KR, sans-serif" font-size="15" font-weight="700" fill="#0f172a" text-anchor="start">nginx (frontend 이미지)</text>
+<text x="490" y="250" font-family="Apple SD Gothic Neo, Pretendard, Noto Sans KR, sans-serif" font-size="13" font-weight="700" fill="#0369a1" text-anchor="start">localhost:3000</text>
+<text x="490" y="272" font-family="Apple SD Gothic Neo, Pretendard, Noto Sans KR, sans-serif" font-size="12" font-weight="400" fill="#64748b" text-anchor="start">정적 파일, /api 프록시</text>
+<path d="M620 292 L620 318" fill="none" stroke="#475569" stroke-width="2" marker-end="url(#arrow)"/>
+<text x="630" y="310" font-family="Apple SD Gothic Neo, Pretendard, Noto Sans KR, sans-serif" font-size="11" font-weight="400" fill="#334155" text-anchor="start">/api/v1</text>
+<rect x="470" y="320" width="300" height="96" rx="10" fill="#ffffff" stroke="#cbd5e1" stroke-width="1.5"/>
+<text x="490" y="350" font-family="Apple SD Gothic Neo, Pretendard, Noto Sans KR, sans-serif" font-size="15" font-weight="700" fill="#0f172a" text-anchor="start">backend 이미지</text>
+<text x="490" y="374" font-family="Apple SD Gothic Neo, Pretendard, Noto Sans KR, sans-serif" font-size="13" font-weight="700" fill="#0369a1" text-anchor="start">localhost:8080</text>
+<text x="490" y="396" font-family="Apple SD Gothic Neo, Pretendard, Noto Sans KR, sans-serif" font-size="12" font-weight="400" fill="#64748b" text-anchor="start">/actuator/health로 상태 확인</text>
+<path d="M620 416 L620 442" fill="none" stroke="#475569" stroke-width="2" marker-end="url(#arrow)"/>
+<text x="630" y="434" font-family="Apple SD Gothic Neo, Pretendard, Noto Sans KR, sans-serif" font-size="11" font-weight="400" fill="#334155" text-anchor="start">SQL</text>
+<rect x="470" y="444" width="300" height="96" rx="10" fill="#ffffff" stroke="#cbd5e1" stroke-width="1.5"/>
+<text x="490" y="474" font-family="Apple SD Gothic Neo, Pretendard, Noto Sans KR, sans-serif" font-size="15" font-weight="700" fill="#0f172a" text-anchor="start">PostgreSQL 컨테이너</text>
+<text x="490" y="498" font-family="Apple SD Gothic Neo, Pretendard, Noto Sans KR, sans-serif" font-size="13" font-weight="700" fill="#0369a1" text-anchor="start">localhost:5432</text>
+<text x="490" y="520" font-family="Apple SD Gothic Neo, Pretendard, Noto Sans KR, sans-serif" font-size="12" font-weight="400" fill="#64748b" text-anchor="start">볼륨 monitoring_pgdata</text>
+<rect x="840" y="110" width="360" height="450" rx="10" fill="#ffffff" stroke="#fcd34d" stroke-width="1.5"/>
+<rect x="840" y="110" width="360" height="64" rx="10" fill="#fef3c7" stroke="#fcd34d" stroke-width="1.5"/>
+<text x="1020" y="138" font-family="Apple SD Gothic Neo, Pretendard, Noto Sans KR, sans-serif" font-size="17" font-weight="700" fill="#0f172a" text-anchor="middle">격리 검증 환경</text>
+<text x="1020" y="160" font-family="Apple SD Gothic Neo, Pretendard, Noto Sans KR, sans-serif" font-size="12" font-weight="400" fill="#475569" text-anchor="middle">scripts/e2e/env.sh up</text>
+<rect x="870" y="196" width="300" height="96" rx="10" fill="#ffffff" stroke="#cbd5e1" stroke-width="1.5"/>
+<text x="890" y="226" font-family="Apple SD Gothic Neo, Pretendard, Noto Sans KR, sans-serif" font-size="15" font-weight="700" fill="#0f172a" text-anchor="start">nginx (frontend 이미지)</text>
+<text x="890" y="250" font-family="Apple SD Gothic Neo, Pretendard, Noto Sans KR, sans-serif" font-size="13" font-weight="700" fill="#0369a1" text-anchor="start">localhost:13100</text>
+<text x="890" y="272" font-family="Apple SD Gothic Neo, Pretendard, Noto Sans KR, sans-serif" font-size="12" font-weight="400" fill="#64748b" text-anchor="start">E2E, 화면 성능 측정</text>
+<path d="M1020 292 L1020 318" fill="none" stroke="#475569" stroke-width="2" marker-end="url(#arrow)"/>
+<text x="1030" y="310" font-family="Apple SD Gothic Neo, Pretendard, Noto Sans KR, sans-serif" font-size="11" font-weight="400" fill="#334155" text-anchor="start">/api/v1</text>
+<rect x="870" y="320" width="300" height="96" rx="10" fill="#ffffff" stroke="#cbd5e1" stroke-width="1.5"/>
+<text x="890" y="350" font-family="Apple SD Gothic Neo, Pretendard, Noto Sans KR, sans-serif" font-size="15" font-weight="700" fill="#0f172a" text-anchor="start">backend 이미지</text>
+<text x="890" y="374" font-family="Apple SD Gothic Neo, Pretendard, Noto Sans KR, sans-serif" font-size="13" font-weight="700" fill="#0369a1" text-anchor="start">localhost:18100</text>
+<text x="890" y="396" font-family="Apple SD Gothic Neo, Pretendard, Noto Sans KR, sans-serif" font-size="12" font-weight="400" fill="#64748b" text-anchor="start">k6 부하 측정</text>
+<path d="M1020 416 L1020 442" fill="none" stroke="#475569" stroke-width="2" marker-end="url(#arrow)"/>
+<text x="1030" y="434" font-family="Apple SD Gothic Neo, Pretendard, Noto Sans KR, sans-serif" font-size="11" font-weight="400" fill="#334155" text-anchor="start">SQL</text>
+<rect x="870" y="444" width="300" height="96" rx="10" fill="#ffffff" stroke="#cbd5e1" stroke-width="1.5"/>
+<text x="890" y="474" font-family="Apple SD Gothic Neo, Pretendard, Noto Sans KR, sans-serif" font-size="15" font-weight="700" fill="#0f172a" text-anchor="start">PostgreSQL 컨테이너</text>
+<text x="890" y="498" font-family="Apple SD Gothic Neo, Pretendard, Noto Sans KR, sans-serif" font-size="13" font-weight="700" fill="#0369a1" text-anchor="start">localhost:55100</text>
+<text x="890" y="520" font-family="Apple SD Gothic Neo, Pretendard, Noto Sans KR, sans-serif" font-size="12" font-weight="400" fill="#64748b" text-anchor="start">DB 값을 바꾸는 E2E 전용</text>
+<rect x="40" y="580" width="1160" height="70" rx="10" fill="#ffffff" stroke="#cbd5e1" stroke-width="1.5" stroke-dasharray="6 4"/>
+<text x="60" y="610" font-family="Apple SD Gothic Neo, Pretendard, Noto Sans KR, sans-serif" font-size="15" font-weight="700" fill="#0f172a" text-anchor="start">Mock 데이터</text>
+<text x="60" y="634" font-family="Apple SD Gothic Neo, Pretendard, Noto Sans KR, sans-serif" font-size="13" font-weight="400" fill="#334155" text-anchor="start">scripts/seed.sql로 각 DB에 적재하고 scripts/verify.sql로 건수와 관계를 확인한다 (Cluster 20, Node 200, Namespace 2,000, Pod 100,000).</text>
+</svg>
