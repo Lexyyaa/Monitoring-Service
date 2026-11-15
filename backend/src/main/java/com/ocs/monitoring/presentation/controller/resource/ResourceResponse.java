@@ -1,5 +1,6 @@
 package com.ocs.monitoring.presentation.controller.resource;
 
+import com.fasterxml.jackson.annotation.JsonInclude;
 import com.ocs.monitoring.application.resource.ResourceInfo;
 import java.time.Instant;
 import java.util.List;
@@ -20,8 +21,16 @@ public final class ResourceResponse {
         }
     }
 
+    /** 필터가 없으면 matchRole을 응답에서 뺀다 */
+    @JsonInclude(JsonInclude.Include.NON_NULL)
     public record TreeItem(
-            long id, String resourceType, String name, String statusCode, String issueLevel, Instant lastUpdatedAt) {
+            long id,
+            String resourceType,
+            String name,
+            String statusCode,
+            String issueLevel,
+            Instant lastUpdatedAt,
+            String matchRole) {
 
         public static TreeItem from(ResourceInfo.TreeItem info) {
             return new TreeItem(
@@ -30,7 +39,8 @@ public final class ResourceResponse {
                     info.name(),
                     info.statusCode(),
                     info.issueLevel(),
-                    info.lastUpdatedAt());
+                    info.lastUpdatedAt(),
+                    info.matchRole());
         }
     }
 

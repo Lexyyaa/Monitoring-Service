@@ -27,7 +27,7 @@ class ResourceSearchRepositoryIntegrationTest {
     @Test
     @DisplayName("대소문자를 무시하고 Cluster·Node·Namespace·Pod 이름을 부분 일치로 찾는다")
     void searchesAllTypesIgnoringCase() {
-        List<ResourceSearchItem> items = searchRepository.search("api", 0, 50);
+        List<ResourceSearchItem> items = searchRepository.search("api", null, 0, 50);
 
         assertThat(items)
                 .extracting(ResourceSearchItem::resourceType)
@@ -38,7 +38,7 @@ class ResourceSearchRepositoryIntegrationTest {
     @Test
     @DisplayName("결과는 소문자 이름 순서이고, Pod 결과는 Cluster부터 자신까지의 경로를 가진다")
     void orderedWithPath() {
-        List<ResourceSearchItem> items = searchRepository.search("pod-payment-api-error", 0, 21);
+        List<ResourceSearchItem> items = searchRepository.search("pod-payment-api-error", null, 0, 21);
 
         assertThat(items)
                 .singleElement()
@@ -46,7 +46,7 @@ class ResourceSearchRepositoryIntegrationTest {
                         .extracting(PathSegment::resourceType)
                         .containsExactly(
                                 ResourceType.CLUSTER, ResourceType.NODE, ResourceType.NAMESPACE, ResourceType.POD));
-        List<String> names = searchRepository.search("ns-01-0", 0, 21).stream()
+        List<String> names = searchRepository.search("ns-01-0", null, 0, 21).stream()
                 .map(item -> item.name().toLowerCase())
                 .toList();
         assertThat(names).isSorted().hasSize(21);
@@ -55,7 +55,7 @@ class ResourceSearchRepositoryIntegrationTest {
     @Test
     @DisplayName("Namespace 결과는 Pod가 있는 최소 ID Node를 대표 경로로 쓴다")
     void namespaceRepresentativePath() {
-        List<ResourceSearchItem> items = searchRepository.search("ns-01-011", 0, 21);
+        List<ResourceSearchItem> items = searchRepository.search("ns-01-011", null, 0, 21);
 
         assertThat(items)
                 .singleElement()

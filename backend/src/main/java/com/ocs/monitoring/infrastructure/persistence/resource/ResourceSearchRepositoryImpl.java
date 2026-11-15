@@ -51,6 +51,7 @@ public class ResourceSearchRepositoryImpl implements ResourceSearchRepository {
             )
             SELECT r.* FROM resources r
             WHERE lower(r.name) LIKE :pattern ESCAPE '!'
+              AND (:issueLevel IS NULL OR r.issue_level=:issueLevel)
             ORDER BY lower(r.name) ASC, r.resource_type ASC, r.id ASC
             LIMIT :limit OFFSET :offset
             """;
@@ -58,7 +59,7 @@ public class ResourceSearchRepositoryImpl implements ResourceSearchRepository {
     private final EntityManager entityManager;
 
     @Override
-    public List<ResourceSearchItem> search(String keyword, long offset, int limit) {
+    public List<ResourceSearchItem> search(String keyword, IssueLevel filter, long offset, int limit) {
         List<Object[]> rows = entityManager
                 .unwrap(Session.class)
                 .createNativeQuery(SEARCH_SQL, Object[].class)
@@ -75,6 +76,7 @@ public class ResourceSearchRepositoryImpl implements ResourceSearchRepository {
                 .addScalar("namespace_id", StandardBasicTypes.LONG)
                 .addScalar("namespace_name", StandardBasicTypes.STRING)
                 .setParameter("pattern", "%" + escapeLike(keyword.toLowerCase(Locale.ROOT)) + "%")
+                .setParameter("issueLevel", filter == null ? null : filter.name(), StandardBasicTypes.STRING)
                 .setParameter("limit", limit)
                 .setParameter("offset", offset)
                 .getResultList();

@@ -24,7 +24,13 @@ public final class ResourceInfo {
     }
 
     public record TreeItem(
-            long id, String resourceType, String name, String statusCode, String issueLevel, Instant lastUpdatedAt) {
+            long id,
+            String resourceType,
+            String name,
+            String statusCode,
+            String issueLevel,
+            Instant lastUpdatedAt,
+            String matchRole) {
 
         public static TreeItem from(TreeResource resource) {
             return new TreeItem(
@@ -33,7 +39,8 @@ public final class ResourceInfo {
                     resource.name(),
                     resource.statusCode(),
                     resource.issueLevel().name(),
-                    resource.lastUpdatedAt());
+                    resource.lastUpdatedAt(),
+                    resource.matchRole() == null ? null : resource.matchRole().name());
         }
     }
 

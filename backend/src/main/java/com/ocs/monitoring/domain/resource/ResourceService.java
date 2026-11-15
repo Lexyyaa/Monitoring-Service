@@ -17,25 +17,25 @@ public class ResourceService {
      * 트리 : 부모를 확인한 뒤 직접 하위 한 단계만 조회한다
      * 없는 부모는 빈 목록이 아니라 404다 (하위 없음으로 오해하지 않게)
      ************************************************************/
-    public List<TreeResource> listClusters() {
-        return treeRepository.findClusters(null);
+    public List<TreeResource> listClusters(IssueLevel filter) {
+        return treeRepository.findClusters(filter);
     }
 
-    public List<TreeResource> listNodes(long clusterId) {
+    public List<TreeResource> listNodes(long clusterId, IssueLevel filter) {
         Cluster cluster = getCluster(clusterId);
-        return treeRepository.findNodes(cluster.getId(), null);
+        return treeRepository.findNodes(cluster.getId(), filter);
     }
 
-    public List<TreeResource> listNamespaces(long nodeId) {
+    public List<TreeResource> listNamespaces(long nodeId, IssueLevel filter) {
         Node node = getNode(nodeId);
-        return treeRepository.findNamespaces(node.getId(), null);
+        return treeRepository.findNamespaces(node.getId(), filter);
     }
 
-    public List<TreeResource> listPods(long nodeId, long namespaceId) {
+    public List<TreeResource> listPods(long nodeId, long namespaceId, IssueLevel filter) {
         Node node = getNode(nodeId);
         Namespace namespace = getNamespace(namespaceId);
         node.requireSameCluster(namespace);
-        return treeRepository.findPods(node.getId(), namespace.getId(), null);
+        return treeRepository.findPods(node.getId(), namespace.getId(), filter);
     }
 
     /************************************************************
@@ -76,10 +76,11 @@ public class ResourceService {
     /************************************************************
      * 검색 : 한 건 더 읽어 다음 페이지 여부를 판단한다 (총건수 집계 없음)
      ************************************************************/
-    public ResourceSearchPage search(String query, int page) {
+    public ResourceSearchPage search(String query, IssueLevel filter, int page) {
         SearchKeyword keyword = SearchKeyword.of(query);
         SearchPageRequest request = new SearchPageRequest(page);
-        List<ResourceSearchItem> rows = searchRepository.search(keyword.value(), request.offset(), request.fetchSize());
+        List<ResourceSearchItem> rows =
+                searchRepository.search(keyword.value(), filter, request.offset(), request.fetchSize());
         return ResourceSearchPage.of(rows);
     }
 

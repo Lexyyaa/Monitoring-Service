@@ -62,7 +62,7 @@ class ResourceServiceTest {
     void missingCluster() {
         given(resourceRepository.findCluster(999)).willReturn(Optional.empty());
 
-        assertThatThrownBy(() -> resourceService.listNodes(999))
+        assertThatThrownBy(() -> resourceService.listNodes(999, null))
                 .isInstanceOf(ResourceException.class)
                 .extracting("errorCode")
                 .isEqualTo(ErrorCode.RESOURCE_NOT_FOUND);
@@ -75,7 +75,7 @@ class ResourceServiceTest {
         given(resourceRepository.findNode(10)).willReturn(Optional.of(node(10, 1)));
         given(resourceRepository.findNamespace(200)).willReturn(Optional.of(namespace(200, 2)));
 
-        assertThatThrownBy(() -> resourceService.listPods(10, 200))
+        assertThatThrownBy(() -> resourceService.listPods(10, 200, null))
                 .isInstanceOf(ResourceException.class)
                 .extracting("errorCode")
                 .isEqualTo(ErrorCode.RESOURCE_NOT_FOUND);
@@ -105,9 +105,9 @@ class ResourceServiceTest {
                         Instant.parse("2026-11-15T00:00:00Z"),
                         List.of()))
                 .toList();
-        given(searchRepository.search("api", 40, 21)).willReturn(rows);
+        given(searchRepository.search("api", null, 40, 21)).willReturn(rows);
 
-        ResourceSearchPage page = resourceService.search("  api  ", 2);
+        ResourceSearchPage page = resourceService.search("  api  ", null, 2);
 
         assertThat(page.items()).hasSize(20);
         assertThat(page.hasNext()).isTrue();
