@@ -1,16 +1,17 @@
 /************************************************************************
  * 검색 화면 컴포넌트 테스트 (jsdom + MSW 가짜 API)
- * 열지 않은 분기 검색, 경로 열기, 디바운스, 늦은 응답, 실패 격리, 빈 결과를 확인한다
+ * 열지 않은 분기 검색, 경로 열기, 디바운스, 늦은 응답, 페이지 사이 중복, 실패 격리, 빈 결과를 확인한다
  ************************************************************************/
 
 import { act, waitFor, within } from '@testing-library/react';
-import { delay, http } from 'msw';
+import { delay, http, HttpResponse } from 'msw';
 import { describe, expect, test } from 'vitest';
 import { API, requestLog, server, unavailable } from '../mocks/server';
 import {
   detailPanel,
   expand,
   openDetail,
+  refreshButton,
   renderApp,
   searchInput,
   searchPanel,
@@ -106,6 +107,60 @@ describe('엣지 케이스', () => {
 
     expect(within(searchPanel()).getByText('pod-ok')).toBeVisible();
     expect(within(searchPanel()).queryByText('payment-svc')).not.toBeInTheDocument();
+  });
+
+  test('SEARCH-T12 페이지 사이에 앞쪽 결과가 추가돼 같은 리소스가 두 번 와도 한 행만 보이고, 갱신 뒤 화면이 응답과 같다', async () => {
+    /** 결과 41건(pod-dup-01~41). shifted면 맨 앞에 pod-dup-00이 추가된 상태다 */
+    const state = { shifted: false };
+    const item = (n: number) => ({
+      id: 9000 + n,
+      resourceType: 'POD',
+      name: `pod-dup-${String(n).padStart(2, '0')}`,
+      statusCode: 'Running',
+      issueLevel: 'NONE',
+      lastUpdatedAt: '2026-11-14T00:00:00Z',
+      path: [
+        { resourceType: 'CLUSTER', id: 1, name: 'cluster-01' },
+        { resourceType: 'NODE', id: 1, name: 'node-01-01' },
+        { resourceType: 'NAMESPACE', id: 1, name: 'ns-01-001' },
+        { resourceType: 'POD', id: 9000 + n, name: `pod-dup-${String(n).padStart(2, '0')}` },
+      ],
+    });
+    server.use(
+      http.get(`${API}/resources/search`, ({ request }) => {
+        const page = Number(new URL(request.url).searchParams.get('page') ?? 0);
+        const all = Array.from({ length: 41 }, (_, i) => item(i + 1));
+        if (state.shifted) all.unshift(item(0));
+        return HttpResponse.json({
+          items: all.slice(page * 20, page * 20 + 20),
+          page,
+          pageSize: 20,
+          hasNext: all.length > page * 20 + 20,
+          fetchedAt: new Date().toISOString(),
+        });
+      }),
+    );
+    const names = () =>
+      within(searchPanel())
+        .queryAllByRole('button', { name: /pod-dup-/ })
+        .map((button) => within(button).getByText(/^pod-dup-/, { selector: 'strong' }).textContent);
+    const user = renderApp();
+    await user.type(searchInput(), 'pod-dup');
+    await within(searchPanel()).findByText('pod-dup-20');
+
+    state.shifted = true;
+    await user.click(within(searchPanel()).getByRole('button', { name: '더 보기' }));
+    await within(searchPanel()).findByText('pod-dup-39');
+
+    // 1페이지 첫 행으로 다시 온 pod-dup-20은 한 번만 보인다
+    expect(names()).toHaveLength(39);
+    expect(new Set(names()).size).toBe(39);
+
+    await user.click(refreshButton());
+    await within(searchPanel()).findByText('pod-dup-00');
+    await waitFor(() =>
+      expect(names()).toEqual(Array.from({ length: 40 }, (_, i) => item(i).name)),
+    );
   });
 
   test('UX-T02 결과가 없으면 오류와 구별되는 빈 상태를 보여 준다', async () => {

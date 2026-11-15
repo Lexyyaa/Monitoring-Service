@@ -14,10 +14,20 @@ export function useResourceSearch(issueLevel?: IssueLevel) {
 
   const result = useInfiniteQuery(resourceQueries.search(query, issueLevel));
 
-  const items = useMemo(
-    () => result.data?.pages.flatMap((page) => page.items) ?? [],
-    [result.data],
-  );
+  /************************************************************
+   * 페이지 합치기 : 같은 리소스(종류:ID)는 처음 나온 것만 남긴다
+   * OFFSET 페이지라 페이지 사이에 앞쪽 리소스가 추가되거나 이름이 바뀌면 같은 리소스가 두 페이지에 온다
+   * 그대로 그리면 행 key가 겹쳐 갱신 뒤에도 없는 행이 화면에 남는다 (docs/report/04-paging-validation.md)
+   ************************************************************/
+  const items = useMemo(() => {
+    const seen = new Set<string>();
+    return (result.data?.pages.flatMap((page) => page.items) ?? []).filter((item) => {
+      const key = `${item.resourceType}:${item.id}`;
+      if (seen.has(key)) return false;
+      seen.add(key);
+      return true;
+    });
+  }, [result.data]);
 
   return {
     input,
