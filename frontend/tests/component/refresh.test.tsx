@@ -1,15 +1,18 @@
 /************************************************************************
  * 갱신 컴포넌트 테스트 (jsdom + MSW 가짜 API, 가짜 타이머)
  * 수동 새로고침과 30초 폴링이 바뀐 값을 반영하고, 화면에서 쓰는 조회만 다시 부르는지 확인한다
+ * 갱신 후에도 사용자의 탐색 상태를 지키고, 실패하면 마지막 성공 데이터를 유지하는지 확인한다
  ************************************************************************/
 
 import { act, screen, waitFor, within } from '@testing-library/react';
+import { http } from 'msw';
 import { describe, expect, test, vi } from 'vitest';
 import { updateResource } from '../mocks/data';
-import { requestLog } from '../mocks/server';
+import { API, requestLog, server, unavailable } from '../mocks/server';
 import {
   detailPanel,
   expand,
+  filterSelect,
   openDetail,
   refreshButton,
   renderApp,
@@ -94,5 +97,99 @@ describe('성공 케이스', () => {
 
     await waitFor(() => expect(refreshButton()).toHaveTextContent('새로고침'));
     expect(refreshButton()).toBeEnabled();
+  });
+});
+
+describe('상태 유지와 복구', () => {
+  test('REFRESH-T03 갱신해도 필터·검색어·펼침·선택이 그대로다', async () => {
+    const user = renderApp();
+    await user.selectOptions(filterSelect(), 'WARNING');
+    await expand(user, 'cluster-01');
+    await waitForRow('node-01-01');
+    await openDetail(user, 'cluster-01');
+    await user.type(searchInput(), 'pod');
+    await within(searchPanel()).findByText('pod-warn');
+
+    await user.click(refreshButton());
+    await waitFor(() => expect(refreshButton()).toHaveTextContent('새로고침'));
+
+    expect(filterSelect()).toHaveValue('WARNING');
+    expect(searchInput()).toHaveValue('pod');
+    expect(rowOf('cluster-01')).toHaveAttribute('aria-expanded', 'true');
+    expect(within(detailPanel()).getByText('cluster-01', { selector: 'strong' })).toBeVisible();
+  });
+
+  test('REFRESH-T04 갱신으로 필터에서 빠진 리소스도 상세는 열어 두고 불일치를 알린다', async () => {
+    const user = renderApp();
+    await user.selectOptions(filterSelect(), 'ERROR');
+    await expand(user, 'cluster-01');
+    await expand(user, 'node-01-01');
+    await expand(user, 'ns-01-001');
+    await openDetail(user, 'pod-error');
+
+    updateResource('POD', 1, { issueLevel: 'NONE' });
+    await user.click(refreshButton());
+
+    await waitFor(() =>
+      expect(within(tree()).queryByRole('button', { name: 'pod-error' })).not.toBeInTheDocument(),
+    );
+    expect(within(detailPanel()).getByText('pod-error', { selector: 'strong' })).toBeVisible();
+    expect(
+      await within(detailPanel()).findByText('현재 상세 리소스는 ERROR 필터에 일치하지 않습니다.'),
+    ).toBeVisible();
+  });
+
+  test('REFRESH-T06 오래전에 바뀐 리소스는 마지막 갱신과 조회 시각을 다르게 보여 준다', async () => {
+    updateResource('CLUSTER', 2, { lastUpdatedAt: '2026-10-01T00:00:00Z' });
+    const user = renderApp();
+
+    await openDetail(user, 'cluster-02');
+
+    const panel = within(detailPanel());
+    expect(panel.getByText(new Date('2026-10-01T00:00:00Z').toLocaleString())).toBeVisible();
+    const fetchedAt = panel.getByText('조회 시각').nextElementSibling?.textContent;
+    expect(fetchedAt).not.toBe(new Date('2026-10-01T00:00:00Z').toLocaleString());
+  });
+
+  test('REFRESH-T07 갱신이 실패해도 마지막 성공 데이터를 유지한다', async () => {
+    vi.useFakeTimers({ shouldAdvanceTime: true });
+    const user = renderApp({ advanceTimers: vi.advanceTimersByTime });
+    await expand(user, 'cluster-01');
+    await waitForRow('node-01-01');
+    await openDetail(user, 'cluster-01');
+    await user.type(searchInput(), 'pod');
+    await within(searchPanel()).findByText('pod-error');
+    const lastFetch = screen.getByText(/마지막 성공 조회/).textContent;
+    server.use(http.get(`${API}/*`, unavailable));
+
+    await user.click(refreshButton());
+    await waitFor(() => expect(screen.getAllByRole('alert').length).toBeGreaterThanOrEqual(3));
+    await act(async () => {
+      vi.advanceTimersByTime(30_000);
+    });
+    await waitFor(() => expect(refreshButton()).toHaveTextContent('새로고침'));
+
+    expect(within(tree()).getByRole('button', { name: 'node-01-01' })).toBeVisible();
+    expect(within(detailPanel()).getByText('cluster-01', { selector: 'strong' })).toBeVisible();
+    expect(within(searchPanel()).getByText('pod-error')).toBeVisible();
+    expect(screen.getAllByText(/이전에 조회한 데이터를 보여 줍니다/).length).toBeGreaterThanOrEqual(
+      3,
+    );
+    expect(refreshButton()).toBeEnabled();
+    expect(screen.getByText(/마지막 성공 조회/).textContent).toBe(lastFetch);
+  });
+
+  test('REFRESH-T09 UNKNOWN은 심각도로만 보여 주고 데이터가 오래됐다는 표시와 섞지 않는다', async () => {
+    const user = renderApp();
+    await expand(user, 'cluster-01');
+    await expand(user, 'node-01-01');
+
+    await openDetail(user, 'ns-01-002');
+
+    const panel = within(detailPanel());
+    expect(panel.getByText('UNKNOWN')).toHaveClass('issue', 'unknown');
+    expect(panel.getByText('마지막 갱신')).toBeVisible();
+    expect(panel.getByText('조회 시각')).toBeVisible();
+    expect(panel.queryByText(/오래|이전에 조회한/)).not.toBeInTheDocument();
   });
 });

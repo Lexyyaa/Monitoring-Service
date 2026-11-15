@@ -148,6 +148,32 @@ test.describe('갱신', () => {
       sql(`UPDATE nodes SET issue_level = '${original}' WHERE id = 2`);
     }
   });
+
+  test('REFRESH-T04 갱신으로 필터에서 빠진 리소스도 상세는 열어 두고 불일치를 알린다', async ({
+    page,
+  }) => {
+    const original = sql('SELECT issue_level FROM pods WHERE id = 1');
+    try {
+      await page.goto('/');
+      await page.getByLabel('트리·검색 심각도').selectOption('ERROR');
+      await searchInput(page).fill(ERROR_POD);
+      await searchPanel(page)
+        .getByRole('button', { name: new RegExp(ERROR_POD) })
+        .click();
+      await expect(row(page, ERROR_POD)).toHaveClass(/selected/);
+
+      sql("UPDATE pods SET issue_level = 'NONE' WHERE id = 1");
+      await page.getByRole('button', { name: '새로고침' }).click();
+
+      await expect(row(page, ERROR_POD)).toHaveCount(0);
+      await expect(detailPanel(page).locator('strong', { hasText: ERROR_POD })).toBeVisible();
+      await expect(
+        detailPanel(page).getByText('ERROR 필터에 일치하지 않습니다', { exact: false }),
+      ).toBeVisible();
+    } finally {
+      sql(`UPDATE pods SET issue_level = '${original}' WHERE id = 1`);
+    }
+  });
 });
 
 test.describe('엣지 케이스', () => {
