@@ -3,6 +3,7 @@ package com.ocs.monitoring.presentation.controller.resource;
 import com.ocs.monitoring.application.resource.ResourceApplicationService;
 import com.ocs.monitoring.application.resource.ResourceCommand;
 import jakarta.validation.constraints.Positive;
+import jakarta.validation.constraints.PositiveOrZero;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.MediaType;
 import org.springframework.web.bind.annotation.GetMapping;
@@ -43,6 +44,16 @@ public class ResourceController {
             @PathVariable @Positive long nodeId, @PathVariable @Positive long namespaceId) {
         ResourceCommand.Pods command = new ResourceCommand.Pods(nodeId, namespaceId);
         return ResourceResponse.TreeList.from(resourceApplicationService.listPods(command));
+    }
+
+    /************************************************************
+     * 전체 이름 검색 (q는 앞뒤 공백을 지우고 1~200자, page는 0부터)
+     ************************************************************/
+    @GetMapping("/resources/search")
+    public ResourceResponse.SearchPage search(
+            @RequestParam String q, @RequestParam(defaultValue = "0") @PositiveOrZero int page) {
+        ResourceCommand.Search command = new ResourceCommand.Search(q, page);
+        return ResourceResponse.SearchPage.from(resourceApplicationService.search(command));
     }
 
     /************************************************************

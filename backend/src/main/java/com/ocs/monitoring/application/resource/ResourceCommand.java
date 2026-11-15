@@ -12,5 +12,7 @@ public final class ResourceCommand {
 
     public record Pods(long nodeId, long namespaceId) {}
 
+    public record Search(String query, int page) {}
+
     public record Detail(String resourceType, long resourceId, Long nodeId) {}
 }

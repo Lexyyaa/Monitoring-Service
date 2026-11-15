@@ -2,6 +2,7 @@ package com.ocs.monitoring.application.resource;
 
 import com.ocs.monitoring.domain.resource.ResourceService;
 import com.ocs.monitoring.domain.resource.ResourceType;
+import com.ocs.monitoring.domain.resource.SearchPageRequest;
 import java.time.Instant;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
@@ -33,6 +34,14 @@ public class ResourceApplicationService {
     public ResourceInfo.TreeList listPods(ResourceCommand.Pods command) {
         return ResourceInfo.TreeList.of(
                 resourceService.listPods(command.nodeId(), command.namespaceId()), Instant.now());
+    }
+
+    public ResourceInfo.SearchPage search(ResourceCommand.Search command) {
+        return ResourceInfo.SearchPage.of(
+                resourceService.search(command.query(), command.page()),
+                command.page(),
+                SearchPageRequest.PAGE_SIZE,
+                Instant.now());
     }
 
     public ResourceInfo.Detail getDetail(ResourceCommand.Detail command) {

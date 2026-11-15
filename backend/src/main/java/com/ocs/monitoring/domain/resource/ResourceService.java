@@ -77,8 +77,9 @@ public class ResourceService {
      * 검색 : 한 건 더 읽어 다음 페이지 여부를 판단한다 (총건수 집계 없음)
      ************************************************************/
     public ResourceSearchPage search(String query, int page) {
+        SearchKeyword keyword = SearchKeyword.of(query);
         SearchPageRequest request = new SearchPageRequest(page);
-        List<ResourceSearchItem> rows = searchRepository.search(query.trim(), request.offset(), request.fetchSize());
+        List<ResourceSearchItem> rows = searchRepository.search(keyword.value(), request.offset(), request.fetchSize());
         return ResourceSearchPage.of(rows);
     }
 

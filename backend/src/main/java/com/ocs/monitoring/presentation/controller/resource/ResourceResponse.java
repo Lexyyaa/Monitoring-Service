@@ -46,6 +46,42 @@ public final class ResourceResponse {
     }
 
     /************************************************************
+     * 전체 검색 : GET /resources/search
+     ************************************************************/
+    public record SearchPage(List<SearchItem> items, int page, int pageSize, boolean hasNext, Instant fetchedAt) {
+
+        public static SearchPage from(ResourceInfo.SearchPage info) {
+            return new SearchPage(
+                    info.items().stream().map(SearchItem::from).toList(),
+                    info.page(),
+                    info.pageSize(),
+                    info.hasNext(),
+                    info.fetchedAt());
+        }
+    }
+
+    public record SearchItem(
+            long id,
+            String resourceType,
+            String name,
+            String statusCode,
+            String issueLevel,
+            Instant lastUpdatedAt,
+            List<PathSegment> path) {
+
+        public static SearchItem from(ResourceInfo.SearchItem info) {
+            return new SearchItem(
+                    info.id(),
+                    info.resourceType(),
+                    info.name(),
+                    info.statusCode(),
+                    info.issueLevel(),
+                    info.lastUpdatedAt(),
+                    PathSegment.fromAll(info.path()));
+        }
+    }
+
+    /************************************************************
      * 상세 : GET /resources/{resourceType}/{resourceId}
      ************************************************************/
     public record Detail(DetailResource resource, Instant fetchedAt) {
