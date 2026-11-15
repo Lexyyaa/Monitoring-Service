@@ -1,5 +1,5 @@
 ########################################################################
-# CI : push·PR 마다 백엔드 테스트(실제 PostgreSQL + 시드)와 프론트 포맷·빌드·테스트를 확인한다
+# CI : push·PR 마다 백엔드 테스트(실제 PostgreSQL + 시드), 프론트 포맷·빌드·테스트, 두 컨테이너 이미지 빌드를 확인한다
 # 백엔드 통합 테스트는 테스트 DB(monitoring_test)에 시드(Cluster 20 … Pod 100,000)가 있어야 하므로
 # 컨텍스트 로드 테스트로 Flyway 스키마를 먼저 만들고 → 시드 → 전체 테스트 순서로 실행한다
 ########################################################################
@@ -73,3 +73,24 @@ jobs:
       - run: npm run format:check
       - run: npm run build
       - run: npm test
+
+  images:
+    name: 컨테이너 이미지 빌드
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: docker/setup-buildx-action@v3
+      - name: backend 이미지
+        uses: docker/build-push-action@v6
+        with:
+          context: backend
+          push: false
+          cache-from: type=gha,scope=backend
+          cache-to: type=gha,mode=max,scope=backend
+      - name: frontend 이미지
+        uses: docker/build-push-action@v6
+        with:
+          context: frontend
+          push: false
+          cache-from: type=gha,scope=frontend
+          cache-to: type=gha,mode=max,scope=frontend
