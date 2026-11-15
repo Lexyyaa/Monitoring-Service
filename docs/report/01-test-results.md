@@ -93,3 +93,14 @@
 - 갱신 실패: 백엔드를 실제로 내리고 새로고침했을 때 트리·검색·상세가 이전 데이터를 유지하고, 세 영역에 "이전에 조회한 데이터를 보여 줍니다"와 재시도가 나왔다. 백엔드를 다시 올리고 새로고침하면 오류가 사라졌다.
 - SEARCH-T07, REFRESH-T08과 필터 전환 중 느린 갱신: 컴포넌트 테스트 통과. 폴링 중에는 버튼이 잠기고, 필터를 바꾸기 전에 보낸 느린 응답은 새 필터 목록을 덮지 않았다.
 - 스크롤 중 폴링 연기: 컴포넌트 테스트 통과. 스크롤 직후에는 폴링을 미루고, 스크롤이 멈추고 1초 뒤에 갱신한다.
+
+## 컨테이너
+
+- 빈 볼륨 기동: 다른 Compose 프로젝트(`monitoring-check`)와 새 볼륨으로 `docker compose up -d --build --wait`를 실행했다.
+  - db, backend, frontend 모두 healthy
+  - 백엔드 이미지가 Flyway V1, V2를 적용했고 2.1초 만에 기동했다.
+  - 첫 기동 때 `monitoring_test` DB도 만들어졌다.
+  - 시드 적재 후 `verify.sql` 통과 (Cluster 20, Node 200, Namespace 2,000, Pod 100,000)
+  - db, backend, frontend 로그에 오류 없음
+- 헬스체크: DB를 멈추면 `/actuator/health`가 503 `DOWN`, 다시 켜면 200 `UP`이었다. `/actuator/env`는 노출하지 않는다(404).
+- 이미지 크기: backend 392MB, frontend 76MB
