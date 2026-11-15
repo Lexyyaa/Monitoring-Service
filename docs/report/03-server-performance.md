@@ -71,3 +71,27 @@ Pod 100,000건 환경의 API와 SQL 측정 기록이다.
 - Docker Desktop 자원: CPU 10, 메모리 약 7.75GiB
 - 데이터: 시드 적재 후 검증 통과 (Cluster 20, Node 200, Namespace 2,000, Pod 100,000), Flyway V1·V2 적용
 - 부하 조건: k6 5 VU, 20초, 반복마다 주요 GET 7개 호출 후 0.5초 대기
+
+### API 부하 · PERF-T08 (컨테이너)
+
+- 실행: `BASE_URL=http://localhost:18100/api/v1 k6 run scripts/k6/api-load.js` ([api-load.js](../../scripts/k6/api-load.js))
+- 결과: 190 반복, 1,330 요청, 검사 2,660/2,660 성공, HTTP 실패율 0%
+- 전체 요청: 평균 5.21ms, p50 5.13ms, p95 8.54ms, 최대 20.85ms
+- API별 (p50 / p95, ms)
+  - Cluster 목록: 6.36 / 11.08
+  - Node 목록: 6.18 / 9.47
+  - Namespace 목록: 5.61 / 8.37
+  - Pod 목록: 4.70 / 6.14
+  - 이름 검색 `q=api`: 3.94 / 5.23
+  - ERROR 필터 Cluster: 6.62 / 8.45
+  - Pod 상세: 2.13 / 3.78
+
+### SQL 실행계획 · PERF-T09 (컨테이너 DB)
+
+- 실행: [explain.sql](../../scripts/explain.sql), [search-plan.sql](../../scripts/search-plan.sql), 각 3회
+- SQL-01 Cluster의 Node 목록: 0.02~0.07ms. Node가 200행뿐이라 순차 스캔을 고른다.
+- SQL-02 Node 아래 Namespace: 0.28~0.50ms. Pod는 `pods_node_namespace_name_id_idx` 인덱스만 읽는다.
+- SQL-03 Pod 목록: 0.01~0.02ms. 같은 인덱스만 읽는다.
+- SQL-04 Pod 이름 `%api%`: 0.01~0.05ms. `pods_name_trgm_idx` GIN 인덱스를 쓴다.
+- SQL-05 ERROR 필터 Cluster: 약 1.4ms. Pod 조건은 첫 일치에서 멈추는 순차 스캔이다.
+- 전체 검색 SQL: `%api%` 0.11~0.36ms, `%a%` 14.6~21.4ms, `%ns-%` 115~134ms. 개발 서버 측정과 같은 경향이다.
