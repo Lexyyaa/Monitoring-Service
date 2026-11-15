@@ -119,14 +119,14 @@
 
 - **DB-03** · 핵심 Pod가 다른 Cluster의 Node를 참조하면 INSERT가 거절된다
   - 지키는 위험: 잘못된 데이터가 들어와 다른 Cluster의 Pod가 트리에 섞임
-  - Given: Cluster 1 소속 Pod
-  - When: Cluster 2의 Node(ID 11)로 INSERT
+  - Given: 테스트가 넣은 Cluster A·B, Cluster A 소속 Pod
+  - When: Cluster B의 Node로 INSERT
   - Then: `pods_cluster_node_fk` 위반 (롤백)
   - 테스트: `DatabaseConstraintIntegrationTest`
 - **DB-04** · 핵심 Pod가 다른 Cluster의 Namespace를 참조하면 INSERT가 거절된다
   - 지키는 위험: 잘못된 데이터가 들어와 다른 Cluster의 Namespace에 Pod가 붙음
-  - Given: Cluster 2 소속 Pod
-  - When: Cluster 1의 Namespace(ID 1)로 INSERT
+  - Given: 테스트가 넣은 Cluster A·B, Cluster B 소속 Pod
+  - When: Cluster A의 Namespace로 INSERT
   - Then: `pods_cluster_namespace_fk` 위반 (롤백)
   - 테스트: `DatabaseConstraintIntegrationTest`
 - **TREE-T07** Node와 다른 Cluster의 Namespace로 Pod 목록을 요청하면 404
@@ -282,10 +282,12 @@
   - 확인: Node가 비어 있는 Pod를 막는가
   - 방법: `node_id = NULL`로 INSERT (`BEGIN … ROLLBACK`)
   - 예상: NOT NULL 제약으로 거절
+  - 자동화: `DatabaseConstraintIntegrationTest`
 - **DB-06** 허용 외 심각도
   - 확인: 정의되지 않은 심각도를 막는가
   - 방법: `issue_level`을 `CRITICAL`, `WARNING`으로 각각 INSERT (`BEGIN … ROLLBACK`)
   - 예상: `CRITICAL`은 CHECK 제약으로 거절, `WARNING`은 저장
+  - 자동화: `DatabaseConstraintIntegrationTest`
 - **DB-07** 시드 재실행
   - 확인: 시드를 두 번 실행해도 데이터가 그대로인가
   - 방법: 적재된 DB에 시드를 한 번 더 실행 (`BEGIN … ROLLBACK`)

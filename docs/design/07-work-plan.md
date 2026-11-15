@@ -51,7 +51,7 @@
   - 완료: Cluster, Node, Namespace, Pod의 필드와 상태 규칙을 구현하고 핵심 규칙을 단위 테스트한다.
 - [x] **P01-02** `feat: Flyway 리소스 스키마와 관계 제약 추가`
   - 완료: PK, FK, UNIQUE, CHECK, Pod의 Cluster 일치 복합 FK가 새 DB에 적용된다.
-- [ ] **P01-03** `test: DB 제약과 잘못된 관계 검증`
+- [x] **P01-03** `test: DB 제약과 잘못된 관계 검증`
   - 확인: `DB-03`부터 `DB-06`까지 실제 PostgreSQL에서 실행한다.
 - [ ] **P01-04** `feat: 목표 규모 Mock 시드와 검증 SQL 추가`
   - 완료: Cluster 20, Node 200, Namespace 2,000, Pod 100,000건 이상을 재현 가능하게 적재한다.
