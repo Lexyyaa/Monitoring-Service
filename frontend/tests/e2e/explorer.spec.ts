@@ -10,9 +10,11 @@ import {
   nameButton,
   openDetail,
   recordApiRequests,
+  requireTestDb,
   row,
   searchInput,
   searchPanel,
+  sql,
   tree,
   waitTreeIdle,
 } from './helpers';
@@ -92,6 +94,85 @@ test.describe('성공 케이스', () => {
     await expect(results).toHaveCount(1);
     await expect(results.first()).toContainText(ERROR_POD);
     await expect(tree(page).locator('.match-role').first()).toHaveText('PATH');
+  });
+});
+
+/************************************************************
+ * DB 값을 바꾸는 갱신 테스트 (E2E_DB_CONTAINER 임시 DB에서만 실행, 끝나면 되돌린다)
+ ************************************************************/
+test.describe('갱신', () => {
+  test.beforeEach(() => requireTestDb());
+
+  test('REFRESH-T01 수동 갱신하면 바뀐 심각도와 갱신 시각을 보여 준다', async ({ page }) => {
+    const original = sql('SELECT issue_level, last_updated_at FROM pods WHERE id = 1');
+    try {
+      await page.goto('/');
+      await searchInput(page).fill(ERROR_POD);
+      await searchPanel(page)
+        .getByRole('button', { name: new RegExp(ERROR_POD) })
+        .click();
+      await expect(detailPanel(page).locator('.detail-common .issue')).toHaveText('ERROR');
+
+      sql(
+        "UPDATE pods SET issue_level = 'NONE', last_updated_at = '2026-11-15T03:00:00Z' WHERE id = 1",
+      );
+      await page.getByRole('button', { name: '새로고침' }).click();
+
+      await expect(detailPanel(page).locator('.detail-common .issue')).toHaveText('NONE');
+      await expect(row(page, ERROR_POD).locator('.issue')).toHaveText('NONE');
+      const updated = await page.evaluate(() => new Date('2026-11-15T03:00:00Z').toLocaleString());
+      await expect(detailPanel(page).getByText(updated)).toBeVisible();
+    } finally {
+      const [level, updatedAt] = original.split('|');
+      sql(
+        `UPDATE pods SET issue_level = '${level}', last_updated_at = '${updatedAt}' WHERE id = 1`,
+      );
+    }
+  });
+
+  test('REFRESH-T02 30초 폴링으로 바뀐 값을 반영하고 펼친 분기는 그대로다', async ({ page }) => {
+    test.setTimeout(90_000);
+    const original = sql('SELECT issue_level FROM nodes WHERE id = 2');
+    try {
+      await page.goto('/');
+      await expand(page, 'cluster-01');
+      await expect(row(page, 'node-01-02').locator('.issue')).toHaveText(original);
+
+      sql("UPDATE nodes SET issue_level = 'ERROR' WHERE id = 2");
+
+      await expect(row(page, 'node-01-02').locator('.issue')).toHaveText('ERROR', {
+        timeout: 40_000,
+      });
+      await expect(row(page, 'cluster-01')).toHaveAttribute('aria-expanded', 'true');
+    } finally {
+      sql(`UPDATE nodes SET issue_level = '${original}' WHERE id = 2`);
+    }
+  });
+
+  test('REFRESH-T04 갱신으로 필터에서 빠진 리소스도 상세는 열어 두고 불일치를 알린다', async ({
+    page,
+  }) => {
+    const original = sql('SELECT issue_level FROM pods WHERE id = 1');
+    try {
+      await page.goto('/');
+      await page.getByLabel('트리·검색 심각도').selectOption('ERROR');
+      await searchInput(page).fill(ERROR_POD);
+      await searchPanel(page)
+        .getByRole('button', { name: new RegExp(ERROR_POD) })
+        .click();
+      await expect(row(page, ERROR_POD)).toHaveClass(/selected/);
+
+      sql("UPDATE pods SET issue_level = 'NONE' WHERE id = 1");
+      await page.getByRole('button', { name: '새로고침' }).click();
+
+      await expect(row(page, ERROR_POD)).toHaveCount(0);
+      await expect(detailPanel(page).locator('strong', { hasText: ERROR_POD })).toBeVisible();
+      await expect(
+        detailPanel(page).getByText('ERROR 필터에 일치하지 않습니다', { exact: false }),
+      ).toBeVisible();
+    } finally {
+      sql(`UPDATE pods SET issue_level = '${original}' WHERE id = 1`);
+    }
   });
 });
 

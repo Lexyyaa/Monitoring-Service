@@ -40,7 +40,8 @@ export default function ResourceDetailPanel({
       {state.isLoading && <p>상세 정보를 불러오는 중…</p>}
       {state.errorMessage && (
         <p role="alert" className="detail-error">
-          {state.errorMessage} <button onClick={state.retry}>다시 시도</button>
+          {state.errorMessage} {state.isStale && '이전에 조회한 데이터를 보여 줍니다.'}{' '}
+          <button onClick={state.retry}>다시 시도</button>
         </p>
       )}
       {isFilterMismatch && (

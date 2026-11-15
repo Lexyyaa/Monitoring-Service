@@ -72,3 +72,12 @@ export function resetMockData() {
 export function findResource(resourceType: ResourceType, id: number) {
   return mockData.find((item) => item.resourceType === resourceType && item.id === id);
 }
+
+/** 테스트에서 값을 바꿀 때 쓴다 (DB 값 변경 흉내) */
+export function updateResource(
+  resourceType: ResourceType,
+  id: number,
+  change: Partial<MockResource>,
+) {
+  Object.assign(findResource(resourceType, id)!, change);
+}

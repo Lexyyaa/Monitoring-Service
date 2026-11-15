@@ -5,11 +5,16 @@
  ************************************************************************/
 package com.ocs.monitoring.integration;
 
+import static org.assertj.core.api.Assertions.assertThat;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.get;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.post;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.jsonPath;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
 
+import com.fasterxml.jackson.databind.JsonNode;
+import com.fasterxml.jackson.databind.ObjectMapper;
+import java.time.Duration;
+import java.time.Instant;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.params.ParameterizedTest;
@@ -34,6 +39,9 @@ class ResourceApiIntegrationTest {
 
     @Autowired
     private JdbcTemplate jdbcTemplate;
+
+    @Autowired
+    private ObjectMapper objectMapper;
 
     /** 공통 오류 본문은 code와 message 두 필드만 있다 */
     private static void expectError(ResultActions result, String code) throws Exception {
@@ -263,5 +271,38 @@ class ResourceApiIntegrationTest {
         expectError(
                 mockMvc.perform(get(API + "/clusters?issueLevel=CRITICAL")).andExpect(status().isBadRequest()),
                 "INVALID_PARAMETER");
+    }
+
+    /************************************************************
+     * 시각 : 시드의 Pod 3(pod-old-status)은 2026-10-01에 마지막으로 바뀌었다
+     ************************************************************/
+    @Test
+    @DisplayName("lastUpdatedAt은 리소스 변경 시각, fetchedAt은 이번 조회 시각으로 따로 응답한다")
+    void lastUpdatedAtAndFetchedAtAreDifferent() throws Exception {
+        Instant before = Instant.now();
+        String body = mockMvc.perform(get(API + "/resources/POD/3"))
+                .andExpect(status().isOk())
+                .andReturn()
+                .getResponse()
+                .getContentAsString();
+        JsonNode json = objectMapper.readTree(body);
+
+        Instant lastUpdatedAt = Instant.parse(json.at("/resource/lastUpdatedAt").asText());
+        Instant fetchedAt = Instant.parse(json.at("/fetchedAt").asText());
+        assertThat(lastUpdatedAt).isEqualTo(Instant.parse("2026-10-01T00:00:00Z"));
+        assertThat(fetchedAt).isBetween(before.minusSeconds(1), Instant.now().plusSeconds(1));
+        assertThat(Duration.between(lastUpdatedAt, fetchedAt)).isPositive();
+        assertThat(json.at("/fetchedAt").asText()).endsWith("Z");
+        assertThat(json.at("/resource/lastUpdatedAt").asText()).endsWith("Z");
+    }
+
+    @Test
+    @DisplayName("트리·검색 목록도 응답마다 조회 시각을 돌려준다")
+    void listsHaveFetchedAt() throws Exception {
+        mockMvc.perform(get(API + "/clusters"))
+                .andExpect(jsonPath("$.fetchedAt").isNotEmpty());
+        mockMvc.perform(get(API + "/resources/search").param("q", "api"))
+                .andExpect(jsonPath("$.fetchedAt").isNotEmpty())
+                .andExpect(jsonPath("$.items[0].lastUpdatedAt").isNotEmpty());
     }
 }

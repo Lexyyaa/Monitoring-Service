@@ -151,6 +151,8 @@ export function useResourceTree({ issueLevel, onSelect }: UseResourceTreeOptions
     isFetching,
     fetchedAt: clusters.data?.fetchedAt,
     rootError: clusters.isError ? toErrorMessage(clusters.error, LOAD_FAILED) : undefined,
+    /** 갱신이 실패해 이전에 성공한 목록을 그대로 보여 주는 중 */
+    isRootStale: clusters.isError && clusters.data !== undefined,
     retryRoot: () => void clusters.refetch(),
     toggle,
     retry,
