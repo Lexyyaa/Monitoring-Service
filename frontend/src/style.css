@@ -21,9 +21,9 @@
   --none-soft: #dcfce7;
   --warning: #b45309;
   --warning-soft: #fef3c7;
-  --error: #dc2626;
+  --error: #b91c1c; /* 연한 배경(--error-soft) 위 글자 대비 5.9:1 */
   --error-soft: #fee2e2;
-  --unknown: #64748b;
+  --unknown: #475569; /* 연한 배경(--unknown-soft) 위 글자 대비 7.0:1 */
   --unknown-soft: #eef2f6;
 
   --header-height: 60px;
