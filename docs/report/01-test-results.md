@@ -106,3 +106,8 @@
 - 이미지 크기: backend 392MB, frontend 76MB
 - nginx 경유 API: 트리 4종, 검색, 필터(트리·검색), Namespace·Pod 상세가 모두 200이었다.
 - nginx 경유 화면: 브라우저에서 탐색 → 상세 → 검색 → ERROR 필터 → 새로고침을 실행했다. API 요청은 모두 화면과 같은 출처(`localhost:13001/api/v1/...`)로 나갔고 오류 표시는 없었다. 새로고침은 Cluster 목록, 펼친 분기 2개, 현재 검색, 열린 상세 5건만 다시 요청했다.
+
+## 릴리스 검증
+
+- 격리 E2E 환경: [env.sh](../../scripts/e2e/env.sh)로 개발과 다른 Compose 프로젝트(`monitoring-e2e`)와 볼륨에 빌드한 이미지 세 개를 띄우고 시드를 적재했다. 세 서비스 healthy, `verify.sql` 통과.
+  - DB 변경 테스트는 이 DB 컨테이너(`monitoring-e2e-db-1`)에만 접속했다.

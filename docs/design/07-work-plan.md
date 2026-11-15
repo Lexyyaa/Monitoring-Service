@@ -167,7 +167,7 @@
 
 관련 문서: [성능 목표](01-requirements.md), [E2E와 성능 시나리오](06-test-scenarios.md).
 
-- [ ] **P05-01** `test: 데이터 변경 E2E용 격리 DB 구성`
+- [x] **P05-01** `test: 데이터 변경 E2E용 격리 DB 구성`
   - 완료: 개발 DB와 다른 Compose 프로젝트, 볼륨에 시드를 적재한다.
 - [ ] **P05-02** `test: 탐색 상세 검색 필터 E2E 작성`
   - 확인: `TREE-T02`, `SEARCH-T05`, `FILTER-T05`, `DETAIL-T01`을 실제 브라우저에서 실행한다.
