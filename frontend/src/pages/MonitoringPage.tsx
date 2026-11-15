@@ -1,5 +1,6 @@
 import { useEffect, useState } from 'react';
 import IssueLevelFilter from '../features/resource-explorer/components/IssueLevelFilter';
+import RefreshControl from '../features/resource-explorer/components/RefreshControl';
 import ResourceDetailPanel from '../features/resource-explorer/components/ResourceDetailPanel';
 import ResourceSearch from '../features/resource-explorer/components/ResourceSearch';
 import ResourceTree from '../features/resource-explorer/components/ResourceTree';
@@ -18,7 +19,7 @@ export default function MonitoringPage() {
   const [selected, setSelected] = useState<TreeSelection>();
   const selection = selected?.selection;
 
-  useRefresh();
+  const refresh = useRefresh();
   const tree = useResourceTree({ issueLevel, onSelect: setSelected });
   const search = useResourceSearch(issueLevel);
   const detail = useResourceDetail(selection);
@@ -45,6 +46,11 @@ export default function MonitoringPage() {
           Infrastructure Monitoring <span>· Kubernetes</span>
         </h1>
         <IssueLevelFilter value={issueLevel} onChange={setIssueLevel} />
+        <RefreshControl
+          isRefreshing={refresh.isRefreshing}
+          lastSuccessfulFetch={refresh.lastSuccessfulFetch}
+          onRefresh={() => void refresh.refresh()}
+        />
       </header>
       <main className={`explorer-layout ${isDetailOpen ? 'with-detail' : ''}`}>
         <ResourceSearch search={search} onSelectResult={(item) => void tree.openPath(item)} />

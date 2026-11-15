@@ -23,6 +23,7 @@ export const treePanel = () => screen.getByRole('region', { name: '리소스 트
 export const searchPanel = () => screen.getByRole('region', { name: '리소스 검색' });
 export const searchInput = () => screen.getByLabelText('전체 리소스 검색');
 export const filterSelect = () => screen.getByLabelText('트리·검색 심각도');
+export const refreshButton = () => screen.getByRole('button', { name: /새로고침|갱신 중/ });
 export const detailPanel = () => screen.getByLabelText('리소스 상세', { selector: 'aside' });
 
 /************************************************************
