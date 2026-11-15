@@ -26,7 +26,7 @@
 
 - [x] **P00-01** `chore: Java 21 Spring Boot 프로젝트 생성`
   - 완료: 지정 버전으로 서버를 시작하고 `./gradlew test`를 실행한다.
-- [ ] **P00-02** `chore: React TypeScript 프로젝트 생성`
+- [x] **P00-02** `chore: React TypeScript 프로젝트 생성`
   - 완료: 개발 서버에서 화면을 열고 `npm run build`를 실행한다.
 - [ ] **P00-03** `chore: PostgreSQL 개발 환경과 설정 분리`
   - 완료: 새 DB 접속을 확인하고 비밀값 없는 환경 변수 예시를 제공한다.
