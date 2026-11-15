@@ -4,7 +4,7 @@ import type { ResourceTreeState } from '../hooks/useResourceTree';
 import ResourceTreeRow from './ResourceTreeRow';
 
 const ROW_HEIGHT = 38;
-/** style.css의 .tree-viewport 높이와 같아야 한다 */
+/** 실제 높이를 재기 전 첫 렌더에 쓰는 값 (style.css의 .tree-viewport 높이는 창 높이를 따라간다) */
 const VIEWPORT_HEIGHT = 600;
 const OVERSCAN_ROWS = 6;
 

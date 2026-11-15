@@ -28,6 +28,9 @@
 
   --header-height: 60px;
   --detail-width: 420px;
+  --col-issue: 84px;
+  --col-status: 84px;
+  --col-extra: 116px;
 
   font-family: Inter, system-ui, sans-serif;
   color: var(--text);
@@ -251,15 +254,17 @@ select {
   color: var(--error);
   font-size: 13px;
 }
-/* 가상 스크롤 계산(ResourceTree의 VIEWPORT_HEIGHT)과 높이를 맞춘다. 안쪽 여백을 두지 않는다 */
+/* 창 높이를 따라가고, 가상 스크롤은 실제 높이를 잰다. 안쪽 여백을 두지 않는다 */
 .tree-viewport {
-  height: 600px;
+  height: clamp(320px, calc(100vh - 330px), 1200px);
   overflow: auto;
 }
+/* 열 고정 그리드 : [펼침][이름][심각도][고유 상태][로딩·오류·MATCH/PATH]. 이름 길이와 관계없이 열이 세로로 맞는다 */
 .tree-row {
-  display: flex;
+  display: grid;
+  grid-template-columns: 22px minmax(0, 1fr) var(--col-issue) var(--col-status) var(--col-extra);
   align-items: center;
-  gap: 10px;
+  column-gap: 14px;
   padding-right: 18px;
   border-bottom: 1px solid var(--border-soft);
   white-space: nowrap;
@@ -291,9 +296,21 @@ select {
   overflow: hidden;
   text-overflow: ellipsis;
   text-align: left;
-  flex: 1;
-  min-width: 90px;
   font-weight: 550;
+}
+.tree-row .issue {
+  justify-self: start;
+}
+.tree-row .status {
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+.row-extra {
+  display: flex;
+  align-items: center;
+  justify-content: flex-end;
+  gap: 8px;
+  overflow: hidden;
 }
 .resource-name:hover {
   color: var(--accent);
@@ -485,16 +502,62 @@ select {
   font-size: 13px;
 }
 
-@media (max-width: 850px) {
+/************************************************************
+ * 좁은 화면
+ * 1100px 이하 : 상세 패널이 본문을 밀지 않고 위에 덮인다. 상단 바는 줄을 바꿀 수 있다
+ * 850px 이하 : 상세 패널이 화면 전체를 덮고, 상단 바 높이는 내용에 맞춘다
+ * 600px 이하 : 트리 여백을 줄이고 고유 상태 열을 숨긴다 (상세 패널에서 확인)
+ ************************************************************/
+@media (max-width: 1100px) {
   :root {
-    --detail-width: 100vw;
+    --detail-width: min(420px, 100vw);
   }
   .explorer-layout.with-detail {
     padding-right: 24px;
   }
   .app-header {
     flex-wrap: wrap;
+    row-gap: 6px;
+  }
+  .last-fetch {
+    min-width: 0;
+  }
+}
+@media (max-width: 850px) {
+  :root {
+    --detail-width: 100vw;
+  }
+  .app-header {
     height: auto;
+    min-height: var(--header-height);
     padding: 10px 16px;
+  }
+  .app-title {
+    flex-basis: 100%;
+  }
+  .detail-panel {
+    top: 0;
+    z-index: 30;
+  }
+}
+@media (max-width: 600px) {
+  :root {
+    --col-issue: 72px;
+    --col-extra: 48px;
+  }
+  .explorer-layout,
+  .explorer-layout.with-detail {
+    padding: 12px 12px 24px;
+  }
+  .tree-row {
+    grid-template-columns: 22px minmax(0, 1fr) var(--col-issue) var(--col-extra);
+    column-gap: 8px;
+    padding-right: 10px;
+  }
+  .tree-row .status {
+    display: none;
+  }
+  .tree-header {
+    padding: 12px 14px;
   }
 }
