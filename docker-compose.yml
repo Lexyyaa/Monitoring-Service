@@ -1,0 +1,28 @@
+########################################################################
+# 로컬 실행용 Docker Compose
+# db : PostgreSQL 17. DB monitoring / 사용자 monitoring (로컬 개발 전용 계정), 데이터는 monitoring_pgdata 볼륨에 유지
+#      docker compose up -d --wait db 로 띄우고 로컬에서 bootRun·npm run dev 를 실행한다
+#      빈 볼륨으로 처음 뜰 때 docker/db-init 의 SQL로 테스트 전용 DB monitoring_test 를 만든다
+#      포트가 겹치면 DB_PORT 환경 변수로 바꾼다
+########################################################################
+
+services:
+  db:
+    image: postgres:17
+    environment:
+      POSTGRES_DB: monitoring
+      POSTGRES_USER: monitoring
+      POSTGRES_PASSWORD: monitoring_dev
+    ports:
+      - "${DB_PORT:-5432}:5432"
+    volumes:
+      - monitoring_pgdata:/var/lib/postgresql/data
+      - ./docker/db-init:/docker-entrypoint-initdb.d:ro
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U monitoring -d monitoring"]
+      interval: 5s
+      timeout: 3s
+      retries: 10
+
+volumes:
+  monitoring_pgdata:
