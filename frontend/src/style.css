@@ -28,6 +28,9 @@
 
   --header-height: 60px;
   --detail-width: 420px;
+  --col-issue: 84px;
+  --col-status: 84px;
+  --col-extra: 116px;
 
   font-family: Inter, system-ui, sans-serif;
   color: var(--text);
@@ -256,10 +259,12 @@ select {
   height: 600px;
   overflow: auto;
 }
+/* 열 고정 그리드 : [펼침][이름][심각도][고유 상태][로딩·오류·MATCH/PATH]. 이름 길이와 관계없이 열이 세로로 맞는다 */
 .tree-row {
-  display: flex;
+  display: grid;
+  grid-template-columns: 22px minmax(0, 1fr) var(--col-issue) var(--col-status) var(--col-extra);
   align-items: center;
-  gap: 10px;
+  column-gap: 14px;
   padding-right: 18px;
   border-bottom: 1px solid var(--border-soft);
   white-space: nowrap;
@@ -291,9 +296,21 @@ select {
   overflow: hidden;
   text-overflow: ellipsis;
   text-align: left;
-  flex: 1;
-  min-width: 90px;
   font-weight: 550;
+}
+.tree-row .issue {
+  justify-self: start;
+}
+.tree-row .status {
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+.row-extra {
+  display: flex;
+  align-items: center;
+  justify-content: flex-end;
+  gap: 8px;
+  overflow: hidden;
 }
 .resource-name:hover {
   color: var(--accent);
