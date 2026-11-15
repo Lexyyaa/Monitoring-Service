@@ -1,9 +1,12 @@
 ########################################################################
 # 로컬 실행용 Docker Compose
-# db : PostgreSQL 17. DB monitoring / 사용자 monitoring (로컬 개발 전용 계정), 데이터는 monitoring_pgdata 볼륨에 유지
-#      docker compose up -d --wait db 로 띄우고 로컬에서 bootRun·npm run dev 를 실행한다
-#      빈 볼륨으로 처음 뜰 때 docker/db-init 의 SQL로 테스트 전용 DB monitoring_test 를 만든다
-#      포트가 겹치면 DB_PORT 환경 변수로 바꾼다
+# db       : PostgreSQL 17. DB monitoring / 사용자 monitoring (로컬 개발 전용 계정), 데이터는 monitoring_pgdata 볼륨에 유지
+#            빈 볼륨으로 처음 뜰 때 docker/db-init 의 SQL로 테스트 전용 DB monitoring_test 를 만든다
+# backend  : Spring Boot API. db 가 healthy 가 된 뒤 시작하고 Flyway 로 스키마를 만든다. /actuator/health 로 상태 확인
+# frontend : backend 가 healthy 가 된 뒤 시작한다. nginx 가 빌드된 화면을 제공하고 /api 를 backend 로 전달한다
+# docker compose up -d --wait db      → DB만 띄우고 로컬에서 bootRun·npm run dev
+# docker compose up -d --build --wait → 세 서비스 전부 컨테이너로. 화면은 http://localhost:3000
+# 포트가 겹치면 DB_PORT·BACKEND_PORT·FRONTEND_PORT 환경 변수로 바꾼다
 ########################################################################
 
 services:
@@ -23,6 +26,26 @@ services:
       interval: 5s
       timeout: 3s
       retries: 10
+
+  backend:
+    build: ./backend
+    environment:
+      DB_URL: jdbc:postgresql://db:5432/monitoring
+      DB_USER: monitoring
+      DB_PASSWORD: monitoring_dev
+    ports:
+      - "${BACKEND_PORT:-8080}:8080"
+    depends_on:
+      db:
+        condition: service_healthy
+
+  frontend:
+    build: ./frontend
+    ports:
+      - "${FRONTEND_PORT:-3000}:80"
+    depends_on:
+      backend:
+        condition: service_healthy
 
 volumes:
   monitoring_pgdata:

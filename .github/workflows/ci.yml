@@ -1,0 +1,96 @@
+########################################################################
+# CI : push·PR 마다 백엔드 테스트(실제 PostgreSQL + 시드), 프론트 포맷·빌드·테스트, 두 컨테이너 이미지 빌드를 확인한다
+# 백엔드 통합 테스트는 테스트 DB(monitoring_test)에 시드(Cluster 20 … Pod 100,000)가 있어야 하므로
+# 컨텍스트 로드 테스트로 Flyway 스키마를 먼저 만들고 → 시드 → 전체 테스트 순서로 실행한다
+########################################################################
+
+name: CI
+
+on:
+  push:
+    branches: [main]
+  pull_request:
+
+jobs:
+  backend:
+    name: Backend 테스트 (PostgreSQL)
+    runs-on: ubuntu-latest
+    services:
+      postgres:
+        image: postgres:17
+        env:
+          POSTGRES_DB: monitoring_test
+          POSTGRES_USER: monitoring
+          POSTGRES_PASSWORD: monitoring_dev
+        ports: ["5432:5432"]
+        options: >-
+          --health-cmd "pg_isready -U monitoring -d monitoring_test"
+          --health-interval 5s --health-timeout 3s --health-retries 10
+    env:
+      TEST_DB_URL: jdbc:postgresql://localhost:5432/monitoring_test
+      PGURL: postgresql://monitoring:monitoring_dev@localhost:5432/monitoring_test
+    defaults:
+      run:
+        working-directory: backend
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-java@v4
+        with:
+          distribution: temurin
+          java-version: "21"
+      - uses: gradle/actions/setup-gradle@v4
+      - name: 포맷 검사와 컴파일
+        run: ./gradlew spotlessCheck compileJava compileTestJava --no-daemon
+      - name: Flyway 스키마 생성 (컨텍스트 로드 테스트)
+        run: ./gradlew test --tests com.ocs.monitoring.MonitoringApplicationTests --no-daemon
+      - name: Mock 데이터 적재·검증
+        working-directory: .
+        run: |
+          psql "$PGURL" -X -v ON_ERROR_STOP=1 -1 -f scripts/seed.sql
+          psql "$PGURL" -X -v ON_ERROR_STOP=1 -f scripts/verify.sql
+      - name: 전체 테스트
+        run: ./gradlew test --no-daemon
+      - uses: actions/upload-artifact@v4
+        if: always()
+        with:
+          name: backend-test-report
+          path: backend/build/reports/tests/test
+
+  frontend:
+    name: Frontend 포맷·빌드·테스트
+    runs-on: ubuntu-latest
+    defaults:
+      run:
+        working-directory: frontend
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: "22"
+          cache: npm
+          cache-dependency-path: frontend/package-lock.json
+      - run: npm ci
+      - run: npm run format:check
+      - run: npm run build
+      - run: npm test
+
+  images:
+    name: 컨테이너 이미지 빌드
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: docker/setup-buildx-action@v3
+      - name: backend 이미지
+        uses: docker/build-push-action@v6
+        with:
+          context: backend
+          push: false
+          cache-from: type=gha,scope=backend
+          cache-to: type=gha,mode=max,scope=backend
+      - name: frontend 이미지
+        uses: docker/build-push-action@v6
+        with:
+          context: frontend
+          push: false
+          cache-from: type=gha,scope=frontend
+          cache-to: type=gha,mode=max,scope=frontend
