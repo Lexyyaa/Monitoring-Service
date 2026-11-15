@@ -251,10 +251,10 @@ select {
   color: var(--error);
   font-size: 13px;
 }
+/* 가상 스크롤 계산(ResourceTree의 VIEWPORT_HEIGHT)과 높이를 맞춘다. 안쪽 여백을 두지 않는다 */
 .tree-viewport {
   height: 600px;
   overflow: auto;
-  padding: 6px 0;
 }
 .tree-row {
   display: flex;

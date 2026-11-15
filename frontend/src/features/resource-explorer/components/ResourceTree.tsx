@@ -1,7 +1,11 @@
+import { useVirtualWindow } from '../../../shared/lib/useVirtualWindow';
 import type { ResourceTreeState } from '../hooks/useResourceTree';
 import ResourceTreeRow from './ResourceTreeRow';
 
 const ROW_HEIGHT = 38;
+/** style.css의 .tree-viewport 높이와 같아야 한다 */
+const VIEWPORT_HEIGHT = 600;
+const OVERSCAN_ROWS = 6;
 
 interface ResourceTreeProps {
   tree: ResourceTreeState;
@@ -11,6 +15,12 @@ interface ResourceTreeProps {
 
 export default function ResourceTree({ tree, selectedKey }: ResourceTreeProps) {
   const { rows } = tree;
+  const view = useVirtualWindow({
+    count: rows.length,
+    rowHeight: ROW_HEIGHT,
+    viewportHeight: VIEWPORT_HEIGHT,
+    overscan: OVERSCAN_ROWS,
+  });
 
   return (
     <section className="tree-panel" aria-label="리소스 트리">
@@ -27,12 +37,15 @@ export default function ResourceTree({ tree, selectedKey }: ResourceTreeProps) {
         </div>
       )}
       <div
+        ref={view.viewportRef}
         className="tree-viewport"
         role="tree"
         aria-label="Kubernetes 리소스"
         aria-busy={tree.isFetching}
+        onScroll={view.onScroll}
       >
-        {rows.map((row) => (
+        <div style={{ height: view.spaceBefore }} />
+        {rows.slice(view.start, view.end).map((row) => (
           <ResourceTreeRow
             key={row.key}
             row={row}
@@ -47,6 +60,7 @@ export default function ResourceTree({ tree, selectedKey }: ResourceTreeProps) {
           <p className="empty">표시할 Cluster가 없습니다.</p>
         )}
         {rows.length === 0 && tree.isFetching && <p className="empty">불러오는 중…</p>}
+        <div style={{ height: view.spaceAfter }} />
       </div>
       <footer>{rows.length.toLocaleString()}개 표시 행</footer>
     </section>
