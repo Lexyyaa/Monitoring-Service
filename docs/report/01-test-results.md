@@ -56,3 +56,9 @@
 - DETAIL-T01 ~ T03, T07과 닫기 동작: 컴포넌트 테스트 통과 (`detail.test.tsx`)
 - DETAIL-T01: E2E 통과. 실제 데이터로 네 종류 상세와 경로를 확인했다.
 - DETAIL-T04: API 통합 테스트로 확인했다. 트리에서 고르면 항상 클릭한 Node를 함께 보낸다.
+
+## 검색 API
+
+- UNIT-04: 단위 테스트 통과. 21건을 읽어 20건만 돌려주고 `hasNext`를 판단한다.
+- SEARCH-T03, T09, T11: 통합 테스트 통과 (`ResourceApiIntegrationTest`)
+  - 검색어는 앞뒤 공백을 지운 뒤 길이를 본다. 공백을 붙인 200자 검색어도 200이다.

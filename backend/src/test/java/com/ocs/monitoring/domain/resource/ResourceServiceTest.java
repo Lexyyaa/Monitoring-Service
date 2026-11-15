@@ -1,9 +1,11 @@
 /************************************************************************
  * 도메인 서비스 단위 테스트 (Mockito로 Repository를 대신함, DB 없이 실행)
  * 없는 부모와 다른 Cluster 경로가 404이고 하위 조회를 하지 않는지, Namespace 외 nodeId가 400인지 확인한다
+ * 검색은 한 건 더 읽어 다음 페이지를 판단하는지 확인한다
  ************************************************************************/
 package com.ocs.monitoring.domain.resource;
 
+import static org.assertj.core.api.Assertions.assertThat;
 import static org.assertj.core.api.Assertions.assertThatThrownBy;
 import static org.mockito.ArgumentMatchers.anyLong;
 import static org.mockito.BDDMockito.given;
@@ -12,7 +14,10 @@ import static org.mockito.Mockito.never;
 
 import com.ocs.monitoring.domain.exception.ErrorCode;
 import com.ocs.monitoring.domain.resource.exception.ResourceException;
+import java.time.Instant;
+import java.util.List;
 import java.util.Optional;
+import java.util.stream.IntStream;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
@@ -29,6 +34,9 @@ class ResourceServiceTest {
 
     @Mock
     private ResourceTreeRepository treeRepository;
+
+    @Mock
+    private ResourceSearchRepository searchRepository;
 
     @InjectMocks
     private ResourceService resourceService;
@@ -81,5 +89,26 @@ class ResourceServiceTest {
                 .extracting("errorCode")
                 .isEqualTo(ErrorCode.INVALID_PARAMETER);
         then(resourceRepository).shouldHaveNoInteractions();
+    }
+
+    @Test
+    @DisplayName("UNIT-04 검색은 21건을 읽어 20건만 돌려주고 hasNext로 다음 페이지를 알린다")
+    void readsOneMoreRow() {
+        List<ResourceSearchItem> rows = IntStream.rangeClosed(1, 21)
+                .mapToObj(i -> new ResourceSearchItem(
+                        i,
+                        ResourceType.POD,
+                        "pod-" + i,
+                        "Running",
+                        IssueLevel.NONE,
+                        Instant.parse("2026-11-15T00:00:00Z"),
+                        List.of()))
+                .toList();
+        given(searchRepository.search("api", 40, 21)).willReturn(rows);
+
+        ResourceSearchPage page = resourceService.search("  api  ", 2);
+
+        assertThat(page.items()).hasSize(20);
+        assertThat(page.hasNext()).isTrue();
     }
 }

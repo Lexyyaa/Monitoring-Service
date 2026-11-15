@@ -12,6 +12,8 @@ import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.
 
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
+import org.junit.jupiter.params.ParameterizedTest;
+import org.junit.jupiter.params.provider.ValueSource;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.autoconfigure.web.servlet.AutoConfigureMockMvc;
 import org.springframework.boot.test.context.SpringBootTest;
@@ -148,5 +150,58 @@ class ResourceApiIntegrationTest {
         mockMvc.perform(get(API + "/resources/NAMESPACE/1"))
                 .andExpect(status().isOk())
                 .andExpect(jsonPath("$.resource.path[1].id").value(1));
+    }
+
+    /************************************************************
+     * 검색 : 시드의 case20only는 20건, case21only는 21건이다
+     ************************************************************/
+    private ResultActions search(String q, String page) throws Exception {
+        var request = get(API + "/resources/search").param("q", q);
+        if (page != null) {
+            request.param("page", page);
+        }
+        return mockMvc.perform(request);
+    }
+
+    @Test
+    @DisplayName("SEARCH-T03 검색 결과 0·20·21건에서 페이지와 hasNext가 맞다")
+    void searchPageBoundaries() throws Exception {
+        search("no-such-resource", null)
+                .andExpect(status().isOk())
+                .andExpect(jsonPath("$.items.length()").value(0))
+                .andExpect(jsonPath("$.hasNext").value(false));
+        search("case20only", null)
+                .andExpect(jsonPath("$.items.length()").value(20))
+                .andExpect(jsonPath("$.hasNext").value(false));
+        search("case21only", null)
+                .andExpect(jsonPath("$.items.length()").value(20))
+                .andExpect(jsonPath("$.pageSize").value(20))
+                .andExpect(jsonPath("$.hasNext").value(true));
+        search("case21only", "1")
+                .andExpect(jsonPath("$.page").value(1))
+                .andExpect(jsonPath("$.items.length()").value(1))
+                .andExpect(jsonPath("$.hasNext").value(false));
+    }
+
+    @Test
+    @DisplayName("SEARCH-T09 공백 검색어·음수 페이지·200자 초과 검색어는 400, 200자는 200")
+    void searchInputValidation() throws Exception {
+        expectError(search("   ", null).andExpect(status().isBadRequest()), "INVALID_PARAMETER");
+        expectError(search("api", "-1").andExpect(status().isBadRequest()), "INVALID_PARAMETER");
+        expectError(search("a".repeat(201), null).andExpect(status().isBadRequest()), "INVALID_PARAMETER");
+        expectError(
+                mockMvc.perform(get(API + "/resources/search")).andExpect(status().isBadRequest()),
+                "INVALID_PARAMETER");
+        search("a".repeat(200), null).andExpect(status().isOk());
+        search("  " + "a".repeat(200) + "  ", null).andExpect(status().isOk());
+    }
+
+    @ParameterizedTest
+    @ValueSource(strings = {"%", "_", "!"})
+    @DisplayName("SEARCH-T11 검색어의 %, _, !는 와일드카드가 아니라 글자로 찾는다")
+    void searchLiteralWildcards(String q) throws Exception {
+        search(q, null)
+                .andExpect(status().isOk())
+                .andExpect(jsonPath("$.items.length()").value(0));
     }
 }
