@@ -2,6 +2,8 @@
 
 ![Cluster, Node, Namespace, Pod의 DB 관계](img/data-model.svg)
 
+---
+
 ## 관계와 화면 경로
 
 - DB에서 Node와 Namespace는 각각 Cluster에 속한다.
@@ -16,12 +18,14 @@
 실제 DDL: [Flyway V1](../../backend/src/main/resources/db/migration/V1__create_resources.sql),
 [검색 인덱스 V2](../../backend/src/main/resources/db/migration/V2__add_trigram_search_indexes.sql).
 
+---
+
 ## 테이블
 
 표의 `필수`는 `NOT NULL`, `선택`은 NULL 허용이다.
 모든 테이블에서 이름은 고유값이 아니다.
 
-### Cluster · `clusters`
+### Cluster (`clusters`)
 
 | 컬럼 | 타입 | 제약 |
 | --- | --- | --- |
@@ -33,7 +37,7 @@
 | `issue_reason` | `TEXT` | 선택 |
 | `last_updated_at` | `TIMESTAMPTZ` | 필수 |
 
-### Node · `nodes`
+### Node (`nodes`)
 
 | 컬럼 | 타입 | 제약 |
 | --- | --- | --- |
@@ -51,7 +55,7 @@
 - `(cluster_id, id)` UNIQUE:
   Pod의 복합 FK가 참조한다.
 
-### Namespace · `namespaces`
+### Namespace (`namespaces`)
 
 | 컬럼 | 타입 | 제약 |
 | --- | --- | --- |
@@ -71,7 +75,7 @@
   Pod의 복합 FK가 참조한다.
 - Node와 직접 FK로 연결하지 않는다.
 
-### Pod · `pods`
+### Pod (`pods`)
 
 | 컬럼 | 타입 | 제약 |
 | --- | --- | --- |
@@ -98,11 +102,13 @@
 
 V1은 삭제 시 `CASCADE`를 지정하지 않는다.
 
+---
+
 ## 조회와 인덱스
 
 - Cluster의 Node: `nodes.cluster_id`.
 - Node의 Namespace: 해당 Node의 Pod에서 중복 제거.
-- Node·Namespace의 Pod: 두 ID를 모두 조건으로 조회.
+- Node, Namespace의 Pod: 두 ID를 모두 조건으로 조회.
 - V1 B-tree
   - `nodes(cluster_id, name, id)`
   - `namespaces(cluster_id, name, id)`
@@ -113,13 +119,15 @@ V1은 삭제 시 `CASCADE`를 지정하지 않는다.
   - 3자 이상 부분 검색에 사용한다.
 
 측정 결과와 남은 병목:
-[API·DB 성능 보고서](../report/03-server-performance.md).
+[API/DB 성능 보고서](../report/03-server-performance.md).
+
+---
 
 ## Mock 데이터
 
 - [기본 시드](../../scripts/seed.sql):
   Cluster 20 / Node 200 / Namespace 2,000 / Pod 100,000건.
-  결정적인 ID·이름을 사용하고 기존 ID는 건너뛴다.
+  결정적인 ID, 이름을 사용하고 기존 ID는 건너뛴다.
 - [검증 SQL](../../scripts/verify.sql):
   행 수, 관계, 검색 경계를 확인한다.
 - [공유 Namespace 시드](../../scripts/seed-shared-namespace.sql):

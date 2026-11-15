@@ -2,6 +2,8 @@
 
 브랜치별 작업을 순서대로 수행한다. 각 작업은 구현, 관련 테스트 작성, 직접 실행을 마친 뒤 체크한다. 기능과 계약은 [요구사항](01-requirements.md), [데이터 모델](03-data-model.md), [API 명세](04-api-spec.md), [OpenAPI](openapi.yaml)를 따른다.
 
+---
+
 ## 브랜치 구성
 
 | 브랜치 | 맡는 일 |
@@ -14,11 +16,15 @@
 | `chore/container-runtime` | 운영용 이미지, Compose, 헬스체크, CI |
 | `chore/release-validation` | 격리된 E2E, 이미지 기반 성능 측정, 결과와 README |
 
+---
+
 ## 진행 기준
 
 - `[ ]`은 미완료, `[x]`는 완료다. 진행 중인 항목에는 `진행 중`을 덧붙인다.
 - 각 작업의 관련 [테스트 시나리오](06-test-scenarios.md)를 확인하고, 실행 결과를 기록한다.
 - 구현 단계에서 필요한 기본 테스트를 작성하고, 별도 `test` 단계에서 경계 조건과 통합 흐름을 확인한다.
+
+---
 
 ## `chore/bootstrap`
 
@@ -42,6 +48,8 @@
   - 완료: 실제 확인한 서버, 화면, DB, 테스트 실행 순서를 적는다.
 
 브랜치 완료: 새 환경에서 두 앱을 빌드하고 테스트 도구를 실행할 수 있으며, 설계 계약의 미해결 차이가 기록되어 있다.
+
+---
 
 ## `feat/resource-explorer`
 
@@ -82,6 +90,8 @@
 
 브랜치 완료: 새 DB의 관계와 시드, 지연 탐색 API와 화면, 상세 API와 패널이 계약에 맞고 관련 테스트를 직접 실행했다.
 
+---
+
 ## `feat/resource-discovery`
 
 관련 문서: [검색과 필터 요구사항](01-requirements.md), [검색 API](04-api-spec.md), [SEARCH, FILTER 시나리오](06-test-scenarios.md), [검색 인덱스 결정](02-adr.md).
@@ -115,6 +125,8 @@
 
 브랜치 완료: 검색, 경로 이동, 상태 필터가 API와 화면에서 일치하고 경계 테스트와 인덱스 근거가 기록되어 있다.
 
+---
+
 ## `feat/resource-refresh`
 
 관련 문서: [갱신 요구사항](01-requirements.md), [API 시각 계약](04-api-spec.md), [REFRESH, UX 시나리오](06-test-scenarios.md).
@@ -137,6 +149,8 @@
   - 확인: `PERF-T05`, `PERF-T06`. 병목을 고쳤다면 같은 조건으로 전후를 비교한다.
 
 브랜치 완료: 실제 상태 변경, 30초 폴링, 수동 갱신, 실패 복구를 테스트와 브라우저에서 확인했다.
+
+---
 
 ## `chore/container-runtime`
 
@@ -162,6 +176,8 @@
   - 완료: CI에서 이미지를 빌드한다. 원격 CI는 실행한 경우에만 통과로 기록한다.
 
 브랜치 완료: 빌드한 이미지로 새 DB에서 기동하고 nginx 경유 화면과 API를 직접 확인했다.
+
+---
 
 ## `chore/release-validation`
 

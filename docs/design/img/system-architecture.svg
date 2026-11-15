@@ -1,72 +1,73 @@
-<svg xmlns="http://www.w3.org/2000/svg" width="1420" height="760" viewBox="0 0 1420 760" role="img" aria-label="Frontend, Backend 4계층, PostgreSQL의 실제 조회 흐름과 의존성">
-<defs><marker id="arrow" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="8" markerHeight="8" orient="auto"><path d="M0 0 L10 5 L0 10 Z" fill="#475569"/></marker></defs>
-<rect x="0" y="0" width="1420" height="760" rx="0" fill="#f8fafc" stroke="#f8fafc" stroke-width="2"/>
-<text x="42" y="54" font-family="Apple SD Gothic Neo, Pretendard, sans-serif" font-size="28" font-weight="700" fill="#0f172a">Infrastructure Monitoring Service · 시스템 구성</text>
-<text x="42" y="84" font-family="Apple SD Gothic Neo, Pretendard, sans-serif" font-size="15" font-weight="400" fill="#475569">실선: 조회 흐름  ·  점선: Domain 계약 의존  ·  아래 그림은 실제 Kubernetes 연동이 없는 로컬 구현</text>
-<rect x="35" y="135" width="270" height="430" rx="14" fill="#e0f2fe" stroke="#0284c7" stroke-width="2"/>
-<text x="55" y="170" font-family="Apple SD Gothic Neo, Pretendard, sans-serif" font-size="22" font-weight="700" fill="#0f172a">React + TypeScript</text>
-<text x="55" y="200" font-family="Apple SD Gothic Neo, Pretendard, sans-serif" font-size="14" font-weight="400" fill="#0369a1">frontend/src</text>
-<path d="M55 220 L285 220" stroke="#7dd3fc" stroke-width="2"/>
-<text x="55" y="253" font-family="Apple SD Gothic Neo, Pretendard, sans-serif" font-size="17" font-weight="700" fill="#0f172a">App.tsx</text>
-<text x="55" y="280" font-family="Apple SD Gothic Neo, Pretendard, sans-serif" font-size="15" font-weight="400" fill="#0f172a">필터 · 선택 · 30초 폴링</text>
-<text x="55" y="316" font-family="Apple SD Gothic Neo, Pretendard, sans-serif" font-size="17" font-weight="700" fill="#0f172a">ResourceTree</text>
-<text x="55" y="343" font-family="Apple SD Gothic Neo, Pretendard, sans-serif" font-size="15" font-weight="400" fill="#0f172a">단계별 조회 · 가시 행 렌더링</text>
-<text x="55" y="379" font-family="Apple SD Gothic Neo, Pretendard, sans-serif" font-size="17" font-weight="700" fill="#0f172a">ResourceSearch</text>
-<text x="55" y="406" font-family="Apple SD Gothic Neo, Pretendard, sans-serif" font-size="15" font-weight="400" fill="#0f172a">검색 · 경로 열기</text>
-<text x="55" y="442" font-family="Apple SD Gothic Neo, Pretendard, sans-serif" font-size="17" font-weight="700" fill="#0f172a">apiClient</text>
-<text x="55" y="469" font-family="Apple SD Gothic Neo, Pretendard, sans-serif" font-size="15" font-weight="400" fill="#0f172a">공통 GET · 오류 처리</text>
-<text x="55" y="530" font-family="Apple SD Gothic Neo, Pretendard, sans-serif" font-size="13" font-weight="400" fill="#0369a1">화면 상태 유지 · 실패 시 이전 데이터</text>
-<rect x="340" y="120" width="790" height="535" rx="18" fill="#ffffff" stroke="#94a3b8" stroke-width="2"/>
-<text x="365" y="155" font-family="Apple SD Gothic Neo, Pretendard, sans-serif" font-size="22" font-weight="700" fill="#0f172a">Spring Boot 3.5 · Java 21</text>
-<text x="790" y="155" font-family="Apple SD Gothic Neo, Pretendard, sans-serif" font-size="14" font-weight="400" fill="#475569">Backend 4계층</text>
-<rect x="365" y="205" width="225" height="245" rx="14" fill="#f1f5f9" stroke="#64748b" stroke-width="2"/>
-<text x="383" y="237" font-family="Apple SD Gothic Neo, Pretendard, sans-serif" font-size="19" font-weight="700" fill="#0f172a">Presentation</text>
-<text x="383" y="267" font-family="Apple SD Gothic Neo, Pretendard, sans-serif" font-size="14" font-weight="400" fill="#0f172a">ResourceController</text>
-<text x="383" y="292" font-family="Apple SD Gothic Neo, Pretendard, sans-serif" font-size="14" font-weight="400" fill="#0f172a">ResourceResponse</text>
-<text x="383" y="317" font-family="Apple SD Gothic Neo, Pretendard, sans-serif" font-size="14" font-weight="400" fill="#0f172a">Bean Validation</text>
-<text x="383" y="352" font-family="Apple SD Gothic Neo, Pretendard, sans-serif" font-size="14" font-weight="400" fill="#0f172a">GlobalExceptionHandler (support)</text>
-<text x="383" y="414" font-family="Apple SD Gothic Neo, Pretendard, sans-serif" font-size="14" font-weight="400" fill="#475569">HTTP 입력 · 응답 · 오류</text>
-<rect x="620" y="205" width="225" height="245" rx="14" fill="#eef2ff" stroke="#6366f1" stroke-width="2"/>
-<text x="638" y="237" font-family="Apple SD Gothic Neo, Pretendard, sans-serif" font-size="19" font-weight="700" fill="#0f172a">Application</text>
-<text x="638" y="267" font-family="Apple SD Gothic Neo, Pretendard, sans-serif" font-size="14" font-weight="400" fill="#0f172a">ResourceApplicationService</text>
-<text x="638" y="292" font-family="Apple SD Gothic Neo, Pretendard, sans-serif" font-size="14" font-weight="400" fill="#0f172a">ResourceCommand · ResourceInfo</text>
-<text x="638" y="317" font-family="Apple SD Gothic Neo, Pretendard, sans-serif" font-size="14" font-weight="400" fill="#0f172a">ResourceService (domain)</text>
-<text x="638" y="352" font-family="Apple SD Gothic Neo, Pretendard, sans-serif" font-size="14" font-weight="400" fill="#0f172a">부모 관계 검증</text>
-<text x="638" y="414" font-family="Apple SD Gothic Neo, Pretendard, sans-serif" font-size="14" font-weight="400" fill="#475569">읽기 전용 트랜잭션</text>
-<rect x="875" y="205" width="225" height="245" rx="14" fill="#ecfdf5" stroke="#059669" stroke-width="2"/>
-<text x="893" y="237" font-family="Apple SD Gothic Neo, Pretendard, sans-serif" font-size="19" font-weight="700" fill="#0f172a">Infrastructure</text>
-<text x="893" y="267" font-family="Apple SD Gothic Neo, Pretendard, sans-serif" font-size="14" font-weight="400" fill="#0f172a">ResourceTreeRepositoryImpl</text>
-<text x="893" y="292" font-family="Apple SD Gothic Neo, Pretendard, sans-serif" font-size="14" font-weight="400" fill="#0f172a">ResourceRepositoryImpl</text>
-<text x="893" y="317" font-family="Apple SD Gothic Neo, Pretendard, sans-serif" font-size="14" font-weight="400" fill="#0f172a">ResourceSearchRepositoryImpl</text>
-<text x="893" y="352" font-family="Apple SD Gothic Neo, Pretendard, sans-serif" font-size="14" font-weight="400" fill="#0f172a">JPA · QueryDSL · 네이티브</text>
-<text x="893" y="414" font-family="Apple SD Gothic Neo, Pretendard, sans-serif" font-size="14" font-weight="400" fill="#475569">SQL · 결과 매핑</text>
-<rect x="620" y="500" width="480" height="115" rx="14" fill="#f8fafc" stroke="#64748b" stroke-width="2"/>
-<text x="638" y="532" font-family="Apple SD Gothic Neo, Pretendard, sans-serif" font-size="19" font-weight="700" fill="#0f172a">Domain</text>
-<text x="638" y="558" font-family="Apple SD Gothic Neo, Pretendard, sans-serif" font-size="14" font-weight="400" fill="#0f172a">엔티티 · IssueLevel · MatchRole · ErrorCode</text>
-<text x="638" y="584" font-family="Apple SD Gothic Neo, Pretendard, sans-serif" font-size="14" font-weight="400" fill="#0f172a">Tree / Search / Detail 저장소 인터페이스</text>
-<rect x="1165" y="205" width="215" height="245" rx="14" fill="#fef3c7" stroke="#d97706" stroke-width="2"/>
-<text x="1183" y="237" font-family="Apple SD Gothic Neo, Pretendard, sans-serif" font-size="19" font-weight="700" fill="#0f172a">PostgreSQL 17</text>
-<text x="1183" y="270" font-family="Apple SD Gothic Neo, Pretendard, sans-serif" font-size="15" font-weight="400" fill="#0f172a">Cluster · Node</text>
-<text x="1183" y="296" font-family="Apple SD Gothic Neo, Pretendard, sans-serif" font-size="15" font-weight="400" fill="#0f172a">Namespace · Pod</text>
-<text x="1183" y="333" font-family="Apple SD Gothic Neo, Pretendard, sans-serif" font-size="15" font-weight="400" fill="#0f172a">복합 FK · CHECK</text>
-<text x="1183" y="359" font-family="Apple SD Gothic Neo, Pretendard, sans-serif" font-size="15" font-weight="400" fill="#0f172a">B-tree · GIN</text>
-<text x="1183" y="414" font-family="Apple SD Gothic Neo, Pretendard, sans-serif" font-size="14" font-weight="400" fill="#92400e">Pod 100,000건</text>
-<rect x="1165" y="525" width="215" height="110" rx="14" fill="#fff" stroke="#94a3b8" stroke-width="2"/>
-<text x="1183" y="557" font-family="Apple SD Gothic Neo, Pretendard, sans-serif" font-size="18" font-weight="700" fill="#0f172a">Flyway · 시드 SQL</text>
-<text x="1183" y="585" font-family="Apple SD Gothic Neo, Pretendard, sans-serif" font-size="14" font-weight="400" fill="#0f172a">V1·V2 / seed.sql</text>
-<text x="1183" y="610" font-family="Apple SD Gothic Neo, Pretendard, sans-serif" font-size="14" font-weight="400" fill="#475569">서비스 조회와 분리</text>
-<path d="M305 325 L365 325" fill="none" stroke="#475569" stroke-width="2.5" marker-end="url(#arrow)"/>
-<text x="310" y="312" font-family="Apple SD Gothic Neo, Pretendard, sans-serif" font-size="13" font-weight="400" fill="#334155">GET</text>
-<path d="M590 325 L620 325" fill="none" stroke="#475569" stroke-width="2.5" marker-end="url(#arrow)"/>
-<path d="M845 325 L875 325" fill="none" stroke="#475569" stroke-width="2.5" marker-end="url(#arrow)"/>
-<path d="M1100 325 L1165 325" fill="none" stroke="#475569" stroke-width="2.5" marker-end="url(#arrow)"/>
-<text x="1107" y="312" font-family="Apple SD Gothic Neo, Pretendard, sans-serif" font-size="13" font-weight="400" fill="#334155">SQL</text>
-<path d="M740 450 L740 500" fill="none" stroke="#475569" stroke-width="2.5" stroke-dasharray="7 5" marker-end="url(#arrow)"/>
-<text x="715" y="462" font-family="Apple SD Gothic Neo, Pretendard, sans-serif" font-size="13" font-weight="400" fill="#334155">모델·계약</text>
-<path d="M980 450 L980 500" fill="none" stroke="#475569" stroke-width="2.5" stroke-dasharray="7 5" marker-end="url(#arrow)"/>
-<text x="955" y="462" font-family="Apple SD Gothic Neo, Pretendard, sans-serif" font-size="13" font-weight="400" fill="#334155">계약 구현</text>
-<path d="M1270 525 L1270 450" fill="none" stroke="#475569" stroke-width="2.5" marker-end="url(#arrow)"/>
-<text x="1245" y="474" font-family="Apple SD Gothic Neo, Pretendard, sans-serif" font-size="13" font-weight="400" fill="#334155">스키마·적재</text>
-<rect x="35" y="680" width="1345" height="50" rx="10" fill="#e2e8f0" stroke="#e2e8f0" stroke-width="2"/>
-<text x="57" y="711" font-family="Apple SD Gothic Neo, Pretendard, sans-serif" font-size="15" font-weight="400" fill="#0f172a">트리: 직접 자식만 조회  ·  검색·필터: DB 처리  ·  갱신: 현재 GET 재호출  ·  실제 Kubernetes 수집 없음</text>
+<svg xmlns="http://www.w3.org/2000/svg" width="1420" height="700" viewBox="0 0 1420 700" role="img" aria-label="시스템 구성">
+<defs><marker id="arrow" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="8" markerHeight="8" orient="auto-start-reverse"><path d="M0 0 L10 5 L0 10 Z" fill="#475569"/></marker></defs>
+<rect width="100%" height="100%" fill="#f8fafc"/>
+<text x="40" y="52" font-family="Apple SD Gothic Neo, Pretendard, Noto Sans KR, sans-serif" font-size="28" font-weight="700" fill="#0f172a" text-anchor="start">시스템 구성</text>
+<text x="40" y="82" font-family="Apple SD Gothic Neo, Pretendard, Noto Sans KR, sans-serif" font-size="14" font-weight="400" fill="#475569" text-anchor="start">실선: 조회 흐름, 점선: 저장소 계약 구현. 실제 Kubernetes에는 연결하지 않고 PostgreSQL의 Mock 데이터를 조회한다.</text>
+<rect x="40" y="110" width="360" height="560" rx="10" fill="#ffffff" stroke="#7dd3fc" stroke-width="1.5"/>
+<rect x="40" y="110" width="360" height="44" rx="10" fill="#e0f2fe" stroke="#7dd3fc" stroke-width="1.5"/>
+<text x="220" y="138" font-family="Apple SD Gothic Neo, Pretendard, Noto Sans KR, sans-serif" font-size="16" font-weight="700" fill="#0c4a6e" text-anchor="middle">브라우저 (React, TypeScript)</text>
+<rect x="60" y="172" width="320" height="84" rx="10" fill="#ffffff" stroke="#cbd5e1" stroke-width="1.5"/>
+<text x="76" y="198" font-family="Apple SD Gothic Neo, Pretendard, Noto Sans KR, sans-serif" font-size="15" font-weight="700" fill="#0f172a" text-anchor="start">pages</text>
+<text x="76" y="222" font-family="Apple SD Gothic Neo, Pretendard, Noto Sans KR, sans-serif" font-size="13" font-weight="400" fill="#334155" text-anchor="start">MonitoringPage</text>
+<text x="76" y="242" font-family="Apple SD Gothic Neo, Pretendard, Noto Sans KR, sans-serif" font-size="12" font-weight="400" fill="#64748b" text-anchor="start">필터, 선택 상태, 화면 배치</text>
+<rect x="60" y="268" width="320" height="84" rx="10" fill="#ffffff" stroke="#cbd5e1" stroke-width="1.5"/>
+<text x="76" y="294" font-family="Apple SD Gothic Neo, Pretendard, Noto Sans KR, sans-serif" font-size="15" font-weight="700" fill="#0f172a" text-anchor="start">features / hooks</text>
+<text x="76" y="318" font-family="Apple SD Gothic Neo, Pretendard, Noto Sans KR, sans-serif" font-size="13" font-weight="400" fill="#334155" text-anchor="start">트리, 검색, 상세, 갱신</text>
+<text x="76" y="338" font-family="Apple SD Gothic Neo, Pretendard, Noto Sans KR, sans-serif" font-size="12" font-weight="400" fill="#64748b" text-anchor="start">TanStack Query로 조회와 캐시</text>
+<rect x="60" y="364" width="320" height="84" rx="10" fill="#ffffff" stroke="#cbd5e1" stroke-width="1.5"/>
+<text x="76" y="390" font-family="Apple SD Gothic Neo, Pretendard, Noto Sans KR, sans-serif" font-size="15" font-weight="700" fill="#0f172a" text-anchor="start">features / components</text>
+<text x="76" y="414" font-family="Apple SD Gothic Neo, Pretendard, Noto Sans KR, sans-serif" font-size="13" font-weight="400" fill="#334155" text-anchor="start">트리, 검색, 상세 패널, 필터</text>
+<text x="76" y="434" font-family="Apple SD Gothic Neo, Pretendard, Noto Sans KR, sans-serif" font-size="12" font-weight="400" fill="#64748b" text-anchor="start">그리기와 이벤트 전달</text>
+<rect x="60" y="460" width="320" height="84" rx="10" fill="#ffffff" stroke="#cbd5e1" stroke-width="1.5"/>
+<text x="76" y="486" font-family="Apple SD Gothic Neo, Pretendard, Noto Sans KR, sans-serif" font-size="15" font-weight="700" fill="#0f172a" text-anchor="start">features / api</text>
+<text x="76" y="510" font-family="Apple SD Gothic Neo, Pretendard, Noto Sans KR, sans-serif" font-size="13" font-weight="400" fill="#334155" text-anchor="start">API 요청, 캐시 키</text>
+<text x="76" y="530" font-family="Apple SD Gothic Neo, Pretendard, Noto Sans KR, sans-serif" font-size="12" font-weight="400" fill="#64748b" text-anchor="start">GET /api/v1</text>
+<rect x="60" y="556" width="320" height="84" rx="10" fill="#ffffff" stroke="#cbd5e1" stroke-width="1.5"/>
+<text x="76" y="582" font-family="Apple SD Gothic Neo, Pretendard, Noto Sans KR, sans-serif" font-size="15" font-weight="700" fill="#0f172a" text-anchor="start">shared</text>
+<text x="76" y="606" font-family="Apple SD Gothic Neo, Pretendard, Noto Sans KR, sans-serif" font-size="13" font-weight="400" fill="#334155" text-anchor="start">API 클라이언트, 가상 스크롤</text>
+<text x="76" y="626" font-family="Apple SD Gothic Neo, Pretendard, Noto Sans KR, sans-serif" font-size="12" font-weight="400" fill="#64748b" text-anchor="start">여러 기능이 쓰는 도구</text>
+<rect x="450" y="330" width="190" height="120" rx="10" fill="#ffffff" stroke="#a5b4fc" stroke-width="1.5"/>
+<text x="545" y="362" font-family="Apple SD Gothic Neo, Pretendard, Noto Sans KR, sans-serif" font-size="14" font-weight="700" fill="#312e81" text-anchor="middle">정적 파일 + /api 프록시</text>
+<text x="545" y="390" font-family="Apple SD Gothic Neo, Pretendard, Noto Sans KR, sans-serif" font-size="13" font-weight="400" fill="#334155" text-anchor="middle">컨테이너: nginx</text>
+<text x="545" y="412" font-family="Apple SD Gothic Neo, Pretendard, Noto Sans KR, sans-serif" font-size="13" font-weight="400" fill="#334155" text-anchor="middle">개발: Vite 개발 서버</text>
+<text x="545" y="434" font-family="Apple SD Gothic Neo, Pretendard, Noto Sans KR, sans-serif" font-size="12" font-weight="400" fill="#64748b" text-anchor="middle">같은 출처로 화면과 API 제공</text>
+<path d="M400 390 L446 390" fill="none" stroke="#475569" stroke-width="2" marker-end="url(#arrow)"/>
+<text x="423" y="378" font-family="Apple SD Gothic Neo, Pretendard, Noto Sans KR, sans-serif" font-size="12" font-weight="400" fill="#334155" text-anchor="middle">GET</text>
+<rect x="690" y="110" width="400" height="560" rx="10" fill="#ffffff" stroke="#86efac" stroke-width="1.5"/>
+<rect x="690" y="110" width="400" height="44" rx="10" fill="#dcfce7" stroke="#86efac" stroke-width="1.5"/>
+<text x="890" y="138" font-family="Apple SD Gothic Neo, Pretendard, Noto Sans KR, sans-serif" font-size="16" font-weight="700" fill="#14532d" text-anchor="middle">Spring Boot 3.5, Java 21</text>
+<rect x="710" y="172" width="360" height="76" rx="10" fill="#ffffff" stroke="#cbd5e1" stroke-width="1.5"/>
+<text x="726" y="202" font-family="Apple SD Gothic Neo, Pretendard, Noto Sans KR, sans-serif" font-size="15" font-weight="700" fill="#0f172a" text-anchor="start">Presentation</text>
+<text x="726" y="226" font-family="Apple SD Gothic Neo, Pretendard, Noto Sans KR, sans-serif" font-size="13" font-weight="400" fill="#334155" text-anchor="start">ResourceController, 입력 검증, 응답 변환</text>
+<rect x="710" y="272" width="360" height="76" rx="10" fill="#ffffff" stroke="#cbd5e1" stroke-width="1.5"/>
+<text x="726" y="302" font-family="Apple SD Gothic Neo, Pretendard, Noto Sans KR, sans-serif" font-size="15" font-weight="700" fill="#0f172a" text-anchor="start">Application</text>
+<text x="726" y="326" font-family="Apple SD Gothic Neo, Pretendard, Noto Sans KR, sans-serif" font-size="13" font-weight="400" fill="#334155" text-anchor="start">읽기 전용 트랜잭션, 조회 시각(fetchedAt)</text>
+<rect x="710" y="372" width="360" height="76" rx="10" fill="#ffffff" stroke="#cbd5e1" stroke-width="1.5"/>
+<text x="726" y="402" font-family="Apple SD Gothic Neo, Pretendard, Noto Sans KR, sans-serif" font-size="15" font-weight="700" fill="#0f172a" text-anchor="start">Domain</text>
+<text x="726" y="426" font-family="Apple SD Gothic Neo, Pretendard, Noto Sans KR, sans-serif" font-size="13" font-weight="400" fill="#334155" text-anchor="start">엔티티, 업무 규칙, 저장소 계약(인터페이스)</text>
+<rect x="710" y="472" width="360" height="76" rx="10" fill="#ffffff" stroke="#cbd5e1" stroke-width="1.5"/>
+<path d="M890 472 L890 452" fill="none" stroke="#475569" stroke-width="2" stroke-dasharray="4 3" marker-end="url(#arrow)"/>
+<text x="900" y="466" font-family="Apple SD Gothic Neo, Pretendard, Noto Sans KR, sans-serif" font-size="12" font-weight="400" fill="#64748b" text-anchor="start">계약 구현</text>
+<text x="726" y="502" font-family="Apple SD Gothic Neo, Pretendard, Noto Sans KR, sans-serif" font-size="15" font-weight="700" fill="#0f172a" text-anchor="start">Infrastructure</text>
+<text x="726" y="526" font-family="Apple SD Gothic Neo, Pretendard, Noto Sans KR, sans-serif" font-size="13" font-weight="400" fill="#334155" text-anchor="start">QueryDSL 트리, 상세 조회, 검색 SQL(UNION ALL)</text>
+<rect x="710" y="572" width="360" height="76" rx="10" fill="#ffffff" stroke="#cbd5e1" stroke-width="1.5" stroke-dasharray="6 4"/>
+<text x="726" y="602" font-family="Apple SD Gothic Neo, Pretendard, Noto Sans KR, sans-serif" font-size="15" font-weight="700" fill="#0f172a" text-anchor="start">Support</text>
+<text x="726" y="626" font-family="Apple SD Gothic Neo, Pretendard, Noto Sans KR, sans-serif" font-size="12" font-weight="400" fill="#334155" text-anchor="start">공통 오류 응답(400/404/405/500/503), QueryDSL 설정</text>
+<path d="M640 390 L706 210" fill="none" stroke="#475569" stroke-width="2" marker-end="url(#arrow)"/>
+<path d="M890 248 L890 268" fill="none" stroke="#475569" stroke-width="2" marker-end="url(#arrow)"/>
+<path d="M890 348 L890 368" fill="none" stroke="#475569" stroke-width="2" marker-end="url(#arrow)"/>
+<rect x="1130" y="250" width="250" height="220" rx="10" fill="#ffffff" stroke="#fcd34d" stroke-width="1.5"/>
+<rect x="1130" y="250" width="250" height="44" rx="10" fill="#fef3c7" stroke="#fcd34d" stroke-width="1.5"/>
+<text x="1255" y="278" font-family="Apple SD Gothic Neo, Pretendard, Noto Sans KR, sans-serif" font-size="16" font-weight="700" fill="#78350f" text-anchor="middle">PostgreSQL 17</text>
+<text x="1150" y="322" font-family="Apple SD Gothic Neo, Pretendard, Noto Sans KR, sans-serif" font-size="13" font-weight="400" fill="#334155" text-anchor="start">Cluster, Node, Namespace, Pod</text>
+<text x="1150" y="352" font-family="Apple SD Gothic Neo, Pretendard, Noto Sans KR, sans-serif" font-size="13" font-weight="400" fill="#334155" text-anchor="start">Pod 100,000건</text>
+<text x="1150" y="382" font-family="Apple SD Gothic Neo, Pretendard, Noto Sans KR, sans-serif" font-size="13" font-weight="400" fill="#334155" text-anchor="start">복합 FK, CHECK 제약</text>
+<text x="1150" y="412" font-family="Apple SD Gothic Neo, Pretendard, Noto Sans KR, sans-serif" font-size="13" font-weight="400" fill="#334155" text-anchor="start">B-tree, GIN(이름 검색)</text>
+<path d="M1070 510 L1126 420" fill="none" stroke="#475569" stroke-width="2" marker-end="url(#arrow)"/>
+<text x="1116" y="492" font-family="Apple SD Gothic Neo, Pretendard, Noto Sans KR, sans-serif" font-size="12" font-weight="400" fill="#334155" text-anchor="middle">SQL</text>
+<rect x="1130" y="520" width="250" height="110" rx="10" fill="#ffffff" stroke="#cbd5e1" stroke-width="1.5" stroke-dasharray="6 4"/>
+<text x="1150" y="550" font-family="Apple SD Gothic Neo, Pretendard, Noto Sans KR, sans-serif" font-size="13" font-weight="700" fill="#0f172a" text-anchor="start">Flyway 마이그레이션 (V1, V2)</text>
+<text x="1150" y="576" font-family="Apple SD Gothic Neo, Pretendard, Noto Sans KR, sans-serif" font-size="13" font-weight="400" fill="#334155" text-anchor="start">seed.sql, verify.sql</text>
+<text x="1150" y="600" font-family="Apple SD Gothic Neo, Pretendard, Noto Sans KR, sans-serif" font-size="12" font-weight="400" fill="#64748b" text-anchor="start">서비스 조회와 별도로 적재</text>
+<path d="M1255 520 L1255 474" fill="none" stroke="#475569" stroke-width="2" stroke-dasharray="7 5" marker-end="url(#arrow)"/>
 </svg>
