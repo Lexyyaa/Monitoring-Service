@@ -19,4 +19,7 @@ RUN addgroup -S app && adduser -S app -G app
 COPY --from=build /workspace/build/libs/*.jar /app/app.jar
 USER app
 EXPOSE 8080
+# DB 연결까지 포함한 상태가 UP일 때만 healthy
+HEALTHCHECK --interval=10s --timeout=3s --start-period=40s --retries=6 \
+    CMD wget -qO- http://localhost:8080/actuator/health | grep -q '"UP"' || exit 1
 ENTRYPOINT ["java", "-jar", "/app/app.jar"]
