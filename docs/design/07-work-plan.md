@@ -57,7 +57,7 @@
   - 완료: Cluster 20, Node 200, Namespace 2,000, Pod 100,000건 이상을 재현 가능하게 적재한다.
 - [x] **P01-05** `test: 시드 건수와 공유 Namespace 검증`
   - 확인: `DB-01`, `DB-02`, `DB-07`을 전용 DB에서 실행한다.
-- [ ] **P01-06** `feat: 트리 직접 하위 조회 저장소 구현`
+- [x] **P01-06** `feat: 트리 직접 하위 조회 저장소 구현`
   - 완료: Node 아래 Namespace를 해당 Node의 Pod에서 찾고, Pod는 Node와 Namespace를 함께 제한한다.
 - [ ] **P01-07** `feat: 트리 API와 공통 오류 응답 구현`
   - 완료: 목록 GET 4개, `fetchedAt`, 400/404/405/500/503 응답이 계약과 일치한다.
