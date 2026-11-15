@@ -59,6 +59,9 @@ export default function ResourceTreeRow({
           오류 · 재시도
         </button>
       )}
+      {item.matchRole && (
+        <span className={`match-role ${item.matchRole.toLowerCase()}`}>{item.matchRole}</span>
+      )}
     </div>
   );
 }

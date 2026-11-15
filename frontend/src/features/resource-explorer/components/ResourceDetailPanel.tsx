@@ -1,8 +1,12 @@
 import type { ResourceDetailState } from '../hooks/useResourceDetail';
-import type { Selection } from '../types';
+import type { IssueLevel, MatchRole, Selection } from '../types';
+import { isOutsideFilter } from '../utils/filterMatch';
 
 interface ResourceDetailPanelProps {
   selection?: Selection;
+  issueLevel?: IssueLevel;
+  /** 선택한 리소스가 지금 트리에서 갖는 일치 역할 (트리에 없으면 undefined) */
+  currentMatchRole?: MatchRole;
   state: ResourceDetailState;
   onClose: () => void;
 }
@@ -10,12 +14,15 @@ interface ResourceDetailPanelProps {
 /** 선택하면 오른쪽에서 열리고 ✕나 Esc로 닫는다. 상태와 심각도, 변경 시각과 조회 시각을 나눠 보여 준다 */
 export default function ResourceDetailPanel({
   selection,
+  issueLevel,
+  currentMatchRole,
   state,
   onClose,
 }: ResourceDetailPanelProps) {
   const isOpen = selection !== undefined;
   const { detail } = state;
   const resource = detail?.resource;
+  const isFilterMismatch = isOutsideFilter(issueLevel, currentMatchRole, resource);
 
   return (
     <aside
@@ -35,6 +42,9 @@ export default function ResourceDetailPanel({
         <p role="alert" className="detail-error">
           {state.errorMessage} <button onClick={state.retry}>다시 시도</button>
         </p>
+      )}
+      {isFilterMismatch && (
+        <p className="filter-mismatch">현재 상세 리소스는 {issueLevel} 필터에 일치하지 않습니다.</p>
       )}
       {resource && detail && (
         <>

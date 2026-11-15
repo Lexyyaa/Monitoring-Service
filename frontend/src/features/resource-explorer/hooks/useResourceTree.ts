@@ -1,8 +1,8 @@
-import { useQueries, useQuery, useQueryClient } from '@tanstack/react-query';
+import { keepPreviousData, useQueries, useQuery, useQueryClient } from '@tanstack/react-query';
 import { useRef, useState } from 'react';
 import { toErrorMessage } from '../../../shared/lib/errorMessage';
 import { resourceQueries } from '../api/resourceQueries';
-import type { ParentRef, SearchItem, Selection, TreeItem } from '../types';
+import type { IssueLevel, ParentRef, SearchItem, Selection, TreeItem } from '../types';
 import { buildTreeRows, rowKey, toParentRef, type TreeRowData } from '../utils/treeRows';
 
 export interface TreeRowView extends TreeRowData {
@@ -18,12 +18,13 @@ export interface TreeSelection {
 }
 
 interface UseResourceTreeOptions {
+  issueLevel?: IssueLevel;
   onSelect: (selected: TreeSelection) => void;
 }
 
 const LOAD_FAILED = '조회에 실패했습니다.';
 
-export function useResourceTree({ onSelect }: UseResourceTreeOptions) {
+export function useResourceTree({ issueLevel, onSelect }: UseResourceTreeOptions) {
   const queryClient = useQueryClient();
   const [expanded, setExpanded] = useState<ReadonlyMap<string, ParentRef>>(new Map());
   const [navigationError, setNavigationError] = useState<string>();
@@ -33,17 +34,22 @@ export function useResourceTree({ onSelect }: UseResourceTreeOptions) {
 
   /************************************************************
    * 조회 : 첫 화면은 Cluster만, 펼친 부모마다 직접 하위 한 단계만
+   * 필터를 바꾸는 동안에는 이전 Cluster 목록을 유지해 빈 화면이 깜빡이지 않게 한다
    ************************************************************/
-  const clusters = useQuery(resourceQueries.clusters());
+  const clusters = useQuery({
+    ...resourceQueries.clusters(issueLevel),
+    placeholderData: keepPreviousData,
+  });
 
   const { rows, openParents } = buildTreeRows(
     clusters.data?.items ?? [],
     expanded,
-    (parent) => queryClient.getQueryData(resourceQueries.children(parent).queryKey)?.items,
+    (parent) =>
+      queryClient.getQueryData(resourceQueries.children(parent, issueLevel).queryKey)?.items,
   );
 
   const branches = useQueries({
-    queries: openParents.map(({ parentRef }) => resourceQueries.children(parentRef)),
+    queries: openParents.map(({ parentRef }) => resourceQueries.children(parentRef, issueLevel)),
   });
   const branchByKey = new Map(openParents.map(({ key }, index) => [key, branches[index]]));
 
@@ -100,7 +106,8 @@ export function useResourceTree({ onSelect }: UseResourceTreeOptions) {
     setNavigationError(undefined);
     try {
       const opened = new Map<string, ParentRef>();
-      let items: TreeItem[] = (await queryClient.fetchQuery(resourceQueries.clusters())).items;
+      let items: TreeItem[] = (await queryClient.fetchQuery(resourceQueries.clusters(issueLevel)))
+        .items;
       let current: TreeItem | undefined;
       let contextNodeId: number | undefined;
 
@@ -114,7 +121,8 @@ export function useResourceTree({ onSelect }: UseResourceTreeOptions) {
         const parentRef = toParentRef(current, contextNodeId)!;
         opened.set(rowKey(current, contextNodeId), parentRef);
         if (current.resourceType === 'NODE') contextNodeId = current.id;
-        items = (await queryClient.fetchQuery(resourceQueries.children(parentRef))).items;
+        items = (await queryClient.fetchQuery(resourceQueries.children(parentRef, issueLevel)))
+          .items;
       }
 
       if (currentNavigation !== navigationId.current || !current) return;
