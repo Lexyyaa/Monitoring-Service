@@ -1,6 +1,9 @@
 /************************************************************************
  * E2E 테스트 (실제 Chrome + 실제 백엔드·PostgreSQL)
  * 시드 기준 : cluster-01 → node-01-01 → ns-01-001 → Pod 50개
+ * 격리 환경 실행 : scripts/e2e/env.sh up 후
+ *   E2E_BASE_URL=http://localhost:13100 E2E_DB_CONTAINER=monitoring-e2e-db-1 npm run test:e2e
+ * DB 값을 바꾸는 갱신 테스트는 E2E_DB_CONTAINER가 있을 때만 실행하고 끝나면 값을 되돌린다
  ************************************************************************/
 
 import { expect, test } from '@playwright/test';
