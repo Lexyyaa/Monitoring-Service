@@ -1,6 +1,9 @@
 /************************************************************************
  * E2E 테스트 (실제 Chrome + 실제 백엔드·PostgreSQL)
  * 시드 기준 : cluster-01 → node-01-01 → ns-01-001 → Pod 50개
+ * 격리 환경 실행 : scripts/e2e/env.sh up 후
+ *   E2E_BASE_URL=http://localhost:13100 E2E_DB_CONTAINER=monitoring-e2e-db-1 npm run test:e2e
+ * DB 값을 바꾸는 갱신 테스트는 E2E_DB_CONTAINER가 있을 때만 실행하고 끝나면 값을 되돌린다
  ************************************************************************/
 
 import { expect, test } from '@playwright/test';
@@ -86,7 +89,10 @@ test.describe('성공 케이스', () => {
 
   test('FILTER-T05 실제 데이터에서 검색어와 필터를 함께 적용한다', async ({ page }) => {
     await page.goto('/');
-    await page.getByLabel('트리·검색 심각도').selectOption('ERROR');
+    await page
+      .locator('.filter-option', { has: page.getByRole('radio', { name: 'ERROR' }) })
+      .click();
+    await expect(page.getByRole('radio', { name: 'ERROR' })).toBeChecked();
 
     await searchInput(page).fill('api');
 
@@ -155,7 +161,10 @@ test.describe('갱신', () => {
     const original = sql('SELECT issue_level FROM pods WHERE id = 1');
     try {
       await page.goto('/');
-      await page.getByLabel('트리·검색 심각도').selectOption('ERROR');
+      await page
+        .locator('.filter-option', { has: page.getByRole('radio', { name: 'ERROR' }) })
+        .click();
+      await expect(page.getByRole('radio', { name: 'ERROR' })).toBeChecked();
       await searchInput(page).fill(ERROR_POD);
       await searchPanel(page)
         .getByRole('button', { name: new RegExp(ERROR_POD) })

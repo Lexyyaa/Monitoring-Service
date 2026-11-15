@@ -38,7 +38,7 @@ export default function ResourceTreeRow({
       aria-level={row.depth + 1}
       aria-expanded={canExpand ? row.isExpanded : undefined}
       aria-selected={isSelected}
-      style={{ height, paddingLeft: 12 + row.depth * INDENT_PX }}
+      style={{ height, paddingLeft: 12 + row.depth * INDENT_PX, ['--depth' as string]: row.depth }}
     >
       <button
         className="toggle"

@@ -106,3 +106,22 @@
 - 이미지 크기: backend 392MB, frontend 76MB
 - nginx 경유 API: 트리 4종, 검색, 필터(트리·검색), Namespace·Pod 상세가 모두 200이었다.
 - nginx 경유 화면: 브라우저에서 탐색 → 상세 → 검색 → ERROR 필터 → 새로고침을 실행했다. API 요청은 모두 화면과 같은 출처(`localhost:13001/api/v1/...`)로 나갔고 오류 표시는 없었다. 새로고침은 Cluster 목록, 펼친 분기 2개, 현재 검색, 열린 상세 5건만 다시 요청했다.
+
+## 릴리스 검증
+
+- 격리 E2E 환경: [env.sh](../../scripts/e2e/env.sh)로 개발과 다른 Compose 프로젝트(`monitoring-e2e`)와 볼륨에 빌드한 이미지 세 개를 띄우고 시드를 적재했다. 세 서비스 healthy, `verify.sql` 통과.
+  - DB 변경 테스트는 이 DB 컨테이너(`monitoring-e2e-db-1`)에만 접속했다.
+- 탐색·상세·검색·필터 E2E: 격리 환경의 nginx(13100)를 거쳐 TREE-T02, DETAIL-T01, SEARCH-T05, FILTER-T05, TREE-T09 5건 통과
+- DB 변경 갱신 E2E: 격리 환경에서 REFRESH-T01, T02, T04 3건 통과. 테스트가 바꾼 Pod 1, Node 2의 값은 끝에 되돌렸다(ERROR, NONE 확인).
+- 최종 재검증 (화면 수정과 Lighthouse 수정 뒤)
+  - 백엔드 59건, 프론트 포맷·빌드·테스트 41건 통과
+  - 격리 환경 E2E 10건 통과 (DB 변경 4건 포함, 바꾼 값은 되돌림)
+  - 첫 재실행에서 필터 E2E 2건이 실패했다. 필터를 버튼으로 바꾸면서 숨긴 라디오 입력을 E2E가 직접 누르려 했기 때문이다. 사람처럼 버튼 라벨을 누르도록 고친 뒤 통과했다.
+  - 화면 반응 재측정: 첫 Cluster 166~217ms, 펼침 29~48ms, 검색 26~43ms, 필터 49~101ms로 모두 목표 안
+
+## GitHub Actions 원격 실행
+
+- [PR #7 실행](https://github.com/Lexyyaa/monitoring/actions/runs/43702314026): 백엔드 테스트, 프론트 포맷·빌드·테스트, 이미지 빌드 세 작업 성공
+- [main push 실행](https://github.com/Lexyyaa/monitoring/actions/runs/43703975059): PR #7 머지 뒤 main에서 세 작업 성공 (백엔드 144초, 프론트 31초, 이미지 208초)
+- 백엔드 작업은 CI의 PostgreSQL에 스키마를 만들고 시드 10만 건을 적재·검증한 뒤 전체 테스트를 실행했다.
+- 이 브랜치의 PR에서도 같은 작업이 실행된다.

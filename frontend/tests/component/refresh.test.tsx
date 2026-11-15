@@ -12,7 +12,8 @@ import { API, requestLog, server, unavailable } from '../mocks/server';
 import {
   detailPanel,
   expand,
-  filterSelect,
+  filterOption,
+  selectFilter,
   openDetail,
   refreshButton,
   renderApp,
@@ -103,7 +104,7 @@ describe('성공 케이스', () => {
 describe('상태 유지와 복구', () => {
   test('REFRESH-T03 갱신해도 필터·검색어·펼침·선택이 그대로다', async () => {
     const user = renderApp();
-    await user.selectOptions(filterSelect(), 'WARNING');
+    await selectFilter(user, 'WARNING');
     await expand(user, 'cluster-01');
     await waitForRow('node-01-01');
     await openDetail(user, 'cluster-01');
@@ -113,7 +114,7 @@ describe('상태 유지와 복구', () => {
     await user.click(refreshButton());
     await waitFor(() => expect(refreshButton()).toHaveTextContent('새로고침'));
 
-    expect(filterSelect()).toHaveValue('WARNING');
+    expect(filterOption('WARNING')).toBeChecked();
     expect(searchInput()).toHaveValue('pod');
     expect(rowOf('cluster-01')).toHaveAttribute('aria-expanded', 'true');
     expect(within(detailPanel()).getByText('cluster-01', { selector: 'strong' })).toBeVisible();
@@ -121,7 +122,7 @@ describe('상태 유지와 복구', () => {
 
   test('REFRESH-T04 갱신으로 필터에서 빠진 리소스도 상세는 열어 두고 불일치를 알린다', async () => {
     const user = renderApp();
-    await user.selectOptions(filterSelect(), 'ERROR');
+    await selectFilter(user, 'ERROR');
     await expand(user, 'cluster-01');
     await expand(user, 'node-01-01');
     await expand(user, 'ns-01-001');
@@ -228,12 +229,12 @@ describe('늦은 응답과 갱신 충돌', () => {
     );
 
     await user.click(refreshButton());
-    await user.selectOptions(filterSelect(), 'WARNING');
+    await selectFilter(user, 'WARNING');
     await waitFor(() => expect(within(tree()).getAllByText('PATH')).toHaveLength(2));
     await act(() => delay(800));
 
     expect(within(tree()).getAllByText('PATH')).toHaveLength(2);
-    expect(filterSelect()).toHaveValue('WARNING');
+    expect(filterOption('WARNING')).toBeChecked();
   });
 });
 
