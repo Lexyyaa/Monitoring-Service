@@ -4,7 +4,15 @@
  ************************************************************************/
 
 import { expect, test } from '@playwright/test';
-import { expand, nameButton, recordApiRequests, row, waitTreeIdle } from './helpers';
+import {
+  detailPanel,
+  expand,
+  nameButton,
+  openDetail,
+  recordApiRequests,
+  row,
+  waitTreeIdle,
+} from './helpers';
 
 test.describe('성공 케이스', () => {
   test('TREE-T02 펼친 부모의 직접 하위만 요청한다', async ({ page }) => {
@@ -24,6 +32,31 @@ test.describe('성공 케이스', () => {
       '/nodes/1/namespaces/1/pods',
     ]);
     await expect(row(page, 'ns-01-001')).toHaveAttribute('aria-expanded', 'true');
+  });
+
+  test('DETAIL-T01 네 종류를 고르면 실제 데이터의 상세와 탐색 경로를 보여 준다', async ({
+    page,
+  }) => {
+    await page.goto('/');
+    await expand(page, 'cluster-01');
+    await expand(page, 'node-01-01');
+
+    await openDetail(page, 'cluster-01');
+    await expect(detailPanel(page).getByText('kubernetesVersion')).toBeVisible();
+    await openDetail(page, 'node-01-01');
+    await expect(detailPanel(page).getByText('cpuUsagePercent')).toBeVisible();
+    await openDetail(page, 'ns-01-001');
+    await expect(detailPanel(page).locator('.detail-path li')).toHaveText([
+      'cluster-01',
+      'node-01-01',
+      'ns-01-001',
+    ]);
+
+    await expand(page, 'ns-01-001');
+    await openDetail(page, 'pod-01-001-045');
+    await expect(detailPanel(page).locator('.detail-path li')).toHaveCount(4);
+    await expect(detailPanel(page).getByText('restartCount')).toBeVisible();
+    await expect(row(page, 'pod-01-001-045')).toHaveClass(/selected/);
   });
 });
 

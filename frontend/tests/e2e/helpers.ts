@@ -11,6 +11,7 @@ import { expect, test, type Page } from '@playwright/test';
  * 화면 영역과 동작
  ************************************************************/
 export const tree = (page: Page) => page.getByRole('tree', { name: 'Kubernetes 리소스' });
+export const detailPanel = (page: Page) => page.locator('aside[aria-label="리소스 상세"]');
 export const nameButton = (page: Page, name: string) =>
   tree(page).getByRole('button', { name, exact: true });
 export const row = (page: Page, name: string) =>
@@ -23,6 +24,11 @@ export async function expand(page: Page, name: string) {
     .getByRole('button', { name: `펼치기 ${name}`, exact: true })
     .click();
   await expect(tree(page).getByRole('button', { name: `접기 ${name}`, exact: true })).toBeVisible();
+}
+
+export async function openDetail(page: Page, name: string) {
+  await nameButton(page, name).click();
+  await expect(detailPanel(page).locator('strong', { hasText: name })).toBeVisible();
 }
 
 export async function waitTreeIdle(page: Page) {

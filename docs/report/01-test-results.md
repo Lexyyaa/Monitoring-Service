@@ -50,3 +50,9 @@
 - DETAIL-T05, T06과 네 종류 정상 응답: 통합 테스트 통과 (`ResourceApiIntegrationTest`)
 - DETAIL-T03, T04의 API 규칙: 통합 테스트 통과. 공유 Namespace에서 `nodeId=2`는 Node 2 경로, `nodeId`가 없으면 Node 1 경로였다.
 - DB-08(상세): `pods` 조회는 `id`, `namespace_id`, `node_id` 조건이 붙는다. 대표 Node 조회는 인덱스만 읽었다(0.02ms).
+
+## 상세 패널
+
+- DETAIL-T01 ~ T03, T07과 닫기 동작: 컴포넌트 테스트 통과 (`detail.test.tsx`)
+- DETAIL-T01: E2E 통과. 실제 데이터로 네 종류 상세와 경로를 확인했다.
+- DETAIL-T04: API 통합 테스트로 확인했다. 트리에서 고르면 항상 클릭한 Node를 함께 보낸다.

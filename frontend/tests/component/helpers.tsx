@@ -1,6 +1,6 @@
 /************************************************************************
  * 컴포넌트 테스트 도우미
- * 실제 화면(App)을 그리고, 사용자가 하는 동작(펼치기·이름 클릭)을 짧은 함수로 묶는다
+ * 실제 화면(App)을 그리고, 사용자가 하는 동작(펼치기·이름 클릭·상세 열기)을 짧은 함수로 묶는다
  ************************************************************************/
 
 import { render, screen, within } from '@testing-library/react';
@@ -20,6 +20,7 @@ export type User = ReturnType<typeof renderApp>;
  ************************************************************/
 export const tree = () => screen.getByRole('tree', { name: 'Kubernetes 리소스' });
 export const treePanel = () => screen.getByRole('region', { name: '리소스 트리' });
+export const detailPanel = () => screen.getByLabelText('리소스 상세', { selector: 'aside' });
 
 /************************************************************
  * 동작
@@ -30,4 +31,9 @@ export async function waitForRow(name: string) {
 
 export async function expand(user: User, name: string) {
   await user.click(await within(tree()).findByRole('button', { name: `펼치기 ${name}` }));
+}
+
+export async function openDetail(user: User, name: string) {
+  await user.click(await waitForRow(name));
+  await within(detailPanel()).findByText(name, { selector: 'strong' });
 }
