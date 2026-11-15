@@ -5,7 +5,7 @@
  ************************************************************************/
 
 import { act, screen, waitFor, within } from '@testing-library/react';
-import { http } from 'msw';
+import { delay, http } from 'msw';
 import { describe, expect, test, vi } from 'vitest';
 import { updateResource } from '../mocks/data';
 import { API, requestLog, server, unavailable } from '../mocks/server';
@@ -191,5 +191,48 @@ describe('상태 유지와 복구', () => {
     expect(panel.getByText('마지막 갱신')).toBeVisible();
     expect(panel.getByText('조회 시각')).toBeVisible();
     expect(panel.queryByText(/오래|이전에 조회한/)).not.toBeInTheDocument();
+  });
+});
+
+describe('늦은 응답과 갱신 충돌', () => {
+  test('REFRESH-T08 폴링 응답을 기다리는 동안 새로고침 버튼은 잠기고, 끝나면 다시 쓸 수 있다', async () => {
+    vi.useFakeTimers({ shouldAdvanceTime: true });
+    const user = renderApp({ advanceTimers: vi.advanceTimersByTime });
+    await waitForRow('cluster-01');
+    server.use(
+      http.get(`${API}/clusters`, async () => {
+        await delay(500);
+        return undefined;
+      }),
+    );
+
+    await act(async () => {
+      vi.advanceTimersByTime(30_000);
+    });
+
+    await vi.waitFor(() => expect(refreshButton()).toHaveTextContent('갱신 중…'));
+    expect(refreshButton()).toBeDisabled();
+    await vi.waitFor(() => expect(refreshButton()).toHaveTextContent('새로고침'));
+    expect(refreshButton()).toBeEnabled();
+    expect(screen.queryByRole('alert')).not.toBeInTheDocument();
+  });
+
+  test('필터를 바꾸기 전에 보낸 느린 갱신 응답이 새 필터 목록을 덮지 않는다', async () => {
+    const user = renderApp();
+    await waitForRow('cluster-02');
+    server.use(
+      http.get(`${API}/clusters`, async ({ request }) => {
+        if (!new URL(request.url).searchParams.has('issueLevel')) await delay(600);
+        return undefined;
+      }),
+    );
+
+    await user.click(refreshButton());
+    await user.selectOptions(filterSelect(), 'WARNING');
+    await waitFor(() => expect(within(tree()).getAllByText('PATH')).toHaveLength(2));
+    await act(() => delay(800));
+
+    expect(within(tree()).getAllByText('PATH')).toHaveLength(2);
+    expect(filterSelect()).toHaveValue('WARNING');
   });
 });
