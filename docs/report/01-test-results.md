@@ -28,3 +28,18 @@
 
 - 적재된 DB에 `seed.sql`을 트랜잭션 안에서 한 번 더 실행하고 롤백했다.
 - 실행 전후 Pod 건수 100,000, ID 합계 5,000,050,000, 최근 갱신 시각 `2026-11-14 00:00:00+00`이 같다.
+
+### DB-08 전체 Pod를 메모리에 올리지 않음 · 확인 (트리)
+
+- Hibernate SQL 로그를 켜고 Cluster → Node → Namespace → Pod를 펼쳤다.
+- `pods`를 읽는 쿼리는 두 개다.
+  - Node 아래 Namespace: `EXISTS (... p.namespace_id = n.id AND p.node_id = ?)`
+  - Pod 목록: `WHERE node_id = ? AND namespace_id = ?`
+- 상세·검색 경로는 해당 기능을 구현할 때 다시 확인한다.
+
+## 트리
+
+- TREE-T01 ~ T05, T08: 컴포넌트 테스트 통과 (`tree.test.tsx`)
+- TREE-T02: E2E 통과. 펼칠 때마다 직접 하위 요청 1건씩만 보냈다.
+- TREE-T06: 저장소 통합 테스트 통과. 공유 Namespace를 만든 뒤에도 Node 아래 Namespace가 중복되지 않는다.
+- TREE-T09: E2E 통과. 2,220행을 펼치고 스크롤하는 동안 DOM의 행은 40개 이하였다.
