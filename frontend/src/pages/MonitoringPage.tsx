@@ -3,6 +3,7 @@ import IssueLevelFilter from '../features/resource-explorer/components/IssueLeve
 import ResourceDetailPanel from '../features/resource-explorer/components/ResourceDetailPanel';
 import ResourceSearch from '../features/resource-explorer/components/ResourceSearch';
 import ResourceTree from '../features/resource-explorer/components/ResourceTree';
+import { useRefresh } from '../features/resource-explorer/hooks/useRefresh';
 import { useResourceDetail } from '../features/resource-explorer/hooks/useResourceDetail';
 import { useResourceSearch } from '../features/resource-explorer/hooks/useResourceSearch';
 import {
@@ -17,6 +18,7 @@ export default function MonitoringPage() {
   const [selected, setSelected] = useState<TreeSelection>();
   const selection = selected?.selection;
 
+  useRefresh();
   const tree = useResourceTree({ issueLevel, onSelect: setSelected });
   const search = useResourceSearch(issueLevel);
   const detail = useResourceDetail(selection);
