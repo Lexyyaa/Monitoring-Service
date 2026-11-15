@@ -48,20 +48,24 @@ export default function ResourceTreeRow({
       >
         {canExpand ? (row.isExpanded ? '▾' : '▸') : '·'}
       </button>
-      <button className="resource-name" onClick={() => onSelect(row)}>
+      <button className="resource-name" title={item.name} onClick={() => onSelect(row)}>
         {item.name}
       </button>
       <span className={`issue ${item.issueLevel.toLowerCase()}`}>{item.issueLevel}</span>
-      <span className="status">{item.statusCode}</span>
-      {row.isLoading && <span className="substate">불러오는 중…</span>}
-      {row.errorMessage && (
-        <button className="retry" onClick={() => onRetry(row)}>
-          오류 · 재시도
-        </button>
-      )}
-      {item.matchRole && (
-        <span className={`match-role ${item.matchRole.toLowerCase()}`}>{item.matchRole}</span>
-      )}
+      <span className="status" title={item.statusCode}>
+        {item.statusCode}
+      </span>
+      <span className="row-extra">
+        {row.isLoading && <span className="substate">불러오는 중…</span>}
+        {row.errorMessage && (
+          <button className="retry" onClick={() => onRetry(row)}>
+            오류 · 재시도
+          </button>
+        )}
+        {item.matchRole && (
+          <span className={`match-role ${item.matchRole.toLowerCase()}`}>{item.matchRole}</span>
+        )}
+      </span>
     </div>
   );
 }
