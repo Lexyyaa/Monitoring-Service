@@ -12,7 +12,8 @@ export default function SearchResults({ search, onSelect }: SearchResultsProps) 
       <div className="search-summary">“{search.query}” 검색 결과</div>
       {search.errorMessage && (
         <p role="alert" className="detail-error">
-          {search.errorMessage} <button onClick={search.retry}>다시 시도</button>
+          {search.errorMessage} {search.isStale && '이전에 조회한 데이터를 보여 줍니다.'}{' '}
+          <button onClick={search.retry}>다시 시도</button>
         </p>
       )}
       {search.isEmpty && <p className="empty">검색 결과가 없습니다.</p>}

@@ -50,7 +50,8 @@ export default function ResourceTree({ tree, selectedKey }: ResourceTreeProps) {
       </header>
       {alertMessage && (
         <div role="alert">
-          {alertMessage} {tree.rootError && <button onClick={tree.retryRoot}>다시 시도</button>}
+          {alertMessage} {tree.isRootStale && '이전에 조회한 데이터를 보여 줍니다.'}{' '}
+          {tree.rootError && <button onClick={tree.retryRoot}>다시 시도</button>}
         </div>
       )}
       <div

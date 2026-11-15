@@ -27,6 +27,8 @@ export function useResourceSearch(issueLevel?: IssueLevel) {
     isLoading: result.isLoading || result.isFetchingNextPage,
     isEmpty: result.isSuccess && items.length === 0,
     errorMessage: result.isError ? toErrorMessage(result.error, '검색에 실패했습니다.') : undefined,
+    /** 갱신이 실패해 이전에 성공한 결과를 그대로 보여 주는 중 */
+    isStale: result.isError && items.length > 0,
     hasNextPage: result.hasNextPage,
     loadMore: () => void result.fetchNextPage(),
     retry: () => void result.refetch(),
