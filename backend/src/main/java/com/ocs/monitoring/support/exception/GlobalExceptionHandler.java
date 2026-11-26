@@ -20,6 +20,11 @@ import org.springframework.web.method.annotation.MethodArgumentTypeMismatchExcep
 import org.springframework.web.servlet.NoHandlerFoundException;
 import org.springframework.web.servlet.resource.NoResourceFoundException;
 
+/************************************************************
+ * 전역 예외 처리
+ * 어느 계층에서 예외가 나든 API 오류 계약({code, message})의 HTTP 응답으로 바꾼다
+ * 응답에는 코드와 안내 문구만 담고 자세한 내용은 로그에만 남김으로써 내부 메시지와 접속 정보가 밖으로 나가지 않게 한다
+ ************************************************************/
 @Slf4j
 @RestControllerAdvice
 public class GlobalExceptionHandler {

@@ -1,3 +1,9 @@
+/************************************************************
+ * 서버 응답과 화면 상태의 타입
+ * 훅과 컴포넌트가 서버 응답을 다룰 때 이 타입을 쓴다. 서버 쪽 타입은 OpenAPI 계약과 같은 모양이다
+ * 선택을 객체 전체가 아니라 종류와 ID로 둠으로써 갱신으로 응답이 바뀌어도 선택이 풀리지 않게 한다
+ ************************************************************/
+
 export type ResourceType = 'CLUSTER' | 'NODE' | 'NAMESPACE' | 'POD';
 export type IssueLevel = 'NONE' | 'WARNING' | 'ERROR' | 'UNKNOWN';
 export type MatchRole = 'MATCH' | 'PATH';

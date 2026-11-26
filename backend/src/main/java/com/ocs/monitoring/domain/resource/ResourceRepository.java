@@ -2,7 +2,11 @@ package com.ocs.monitoring.domain.resource;
 
 import java.util.Optional;
 
-/** ID로 리소스를 읽는다. 판단은 하지 않는다 */
+/************************************************************
+ * 단건 조회 저장소 계약
+ * 서비스가 부모나 상세 대상을 확인할 때 ID로 읽는다. 판단은 하지 않는다
+ * 계약을 Domain에 둠으로써 Domain이 JPA, QueryDSL을 몰라도 되게 한다 (구현은 Infrastructure)
+ ************************************************************/
 public interface ResourceRepository {
 
     Optional<Cluster> findCluster(long id);

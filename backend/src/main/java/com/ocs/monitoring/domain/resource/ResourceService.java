@@ -5,6 +5,11 @@ import java.util.List;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 
+/************************************************************
+ * 리소스 조회의 도메인 서비스
+ * 트리, 상세를 요청받을 때 부모와 경로가 실제로 있는지 확인한 뒤 필요한 한 단계만 저장소에서 읽는다
+ * 없는 부모를 빈 목록이 아니라 404로 돌려줌으로써 "하위 없음"과 "잘못된 경로"를 구분하게 한다
+ ************************************************************/
 @Service
 @RequiredArgsConstructor
 public class ResourceService {

@@ -15,6 +15,11 @@ import lombok.Getter;
 import lombok.NoArgsConstructor;
 import org.hibernate.annotations.Immutable;
 
+/************************************************************
+ * Cluster 엔티티 (clusters 테이블, 트리 최상위)
+ * 트리와 상세를 만들 때 자기 경로 한 단계(PathSegment)와 상세(ResourceDetail)로 바뀐다
+ * @Immutable로 둠으로써 조회 전용임을 보장한다 (변경 감지, UPDATE 없음)
+ ************************************************************/
 @Entity
 @Immutable
 @Table(name = "clusters")

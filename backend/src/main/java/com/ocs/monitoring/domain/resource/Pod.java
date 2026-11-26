@@ -15,6 +15,11 @@ import lombok.Getter;
 import lombok.NoArgsConstructor;
 import org.hibernate.annotations.Immutable;
 
+/************************************************************
+ * Pod 엔티티 (pods 테이블, Node와 Namespace에 함께 속함)
+ * 상세를 만들 때 실제로 배치된 Cluster, Node, Namespace를 받아 경로를 만든다
+ * @Immutable로 둠으로써 조회 전용임을 보장한다 (변경 감지, UPDATE 없음)
+ ************************************************************/
 @Entity
 @Immutable
 @Table(name = "pods")

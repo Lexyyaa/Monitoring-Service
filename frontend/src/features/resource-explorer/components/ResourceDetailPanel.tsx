@@ -1,3 +1,10 @@
+/************************************************************
+ * 상세 화면
+ * 리소스를 선택할 때 오른쪽에 열려 속성, 경로, 상태, 심각도를 보여 주고 ✕나 Esc를 누를 때 닫힌다
+ * 변경 시각(lastUpdatedAt)과 조회 시각(fetchedAt)을 나눠 보여 줌으로써 언제 바뀌었고 언제 확인했는지 구분하게 한다
+ * 필터를 바꿔 선택한 리소스가 필터에서 벗어날 때 그 사실을 알린다
+ ************************************************************/
+
 import type { ResourceDetailState } from '../hooks/useResourceDetail';
 import type { IssueLevel, MatchRole, Selection } from '../types';
 import { isOutsideFilter } from '../utils/filterMatch';

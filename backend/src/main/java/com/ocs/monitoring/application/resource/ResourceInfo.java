@@ -10,11 +10,16 @@ import java.util.Map;
 import lombok.AccessLevel;
 import lombok.NoArgsConstructor;
 
+/************************************************************
+ * Application 결과
+ * 도메인 조회가 끝날 때 결과와 조회 시각을 담아 Controller에 돌려준다
+ * Domain 타입을 문자열과 기본 타입으로 바꿔 내보냄으로써 Controller가 Domain에 의존하지 않게 한다
+ ************************************************************/
 @NoArgsConstructor(access = AccessLevel.PRIVATE)
 public final class ResourceInfo {
 
     /************************************************************
-     * 트리 목록
+     * 트리 목록 : 행 목록과 이번 조회 시각
      ************************************************************/
     public record TreeList(List<TreeItem> items, Instant fetchedAt) {
 
@@ -59,7 +64,7 @@ public final class ResourceInfo {
     }
 
     /************************************************************
-     * 상세
+     * 상세 : 공통 필드, 종류별 속성, 탐색 경로
      ************************************************************/
     public record Detail(DetailResource resource, Instant fetchedAt) {
 
