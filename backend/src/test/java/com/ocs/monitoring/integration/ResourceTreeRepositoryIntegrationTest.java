@@ -53,6 +53,19 @@ class ResourceTreeRepositoryIntegrationTest {
     }
 
     @Test
+    @DisplayName("Pod가 없는 Namespace는 그 Cluster의 어떤 Node 아래에도 나오지 않는다")
+    void namespaceWithoutPodIsHidden() {
+        jdbcTemplate.update("""
+                INSERT INTO namespaces (id, cluster_id, name, phase, issue_level, last_updated_at)
+                VALUES (90001, 1, 'ns-no-pod', 'Active', 'NONE', now())
+                """);
+
+        for (long nodeId = 1; nodeId <= 10; nodeId++) {
+            assertThat(ids(treeRepository.findNamespaces(nodeId, null))).doesNotContain(90001L);
+        }
+    }
+
+    @Test
     @DisplayName("Pod는 Node와 Namespace를 함께 만족하는 것만 읽는다")
     void podsOfNodeAndNamespace() {
         assertThat(treeRepository.findPods(1, 1, null)).hasSize(50);

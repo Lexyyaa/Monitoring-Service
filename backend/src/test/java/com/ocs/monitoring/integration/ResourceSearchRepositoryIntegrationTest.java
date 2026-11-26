@@ -15,6 +15,7 @@ import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
+import org.springframework.jdbc.core.JdbcTemplate;
 import org.springframework.transaction.annotation.Transactional;
 
 @SpringBootTest
@@ -23,6 +24,9 @@ class ResourceSearchRepositoryIntegrationTest {
 
     @Autowired
     private ResourceSearchRepository searchRepository;
+
+    @Autowired
+    private JdbcTemplate jdbcTemplate;
 
     @Test
     @DisplayName("대소문자를 무시하고 Cluster·Node·Namespace·Pod 이름을 부분 일치로 찾는다")
@@ -60,5 +64,16 @@ class ResourceSearchRepositoryIntegrationTest {
         assertThat(items)
                 .singleElement()
                 .satisfies(item -> assertThat(item.path().get(1).id()).isEqualTo(2L));
+    }
+
+    @Test
+    @DisplayName("Pod가 없는 Namespace는 Node 경로가 없으므로 검색 결과에 나오지 않는다")
+    void namespaceWithoutPodIsNotSearched() {
+        jdbcTemplate.update("""
+                INSERT INTO namespaces (id, cluster_id, name, phase, issue_level, last_updated_at)
+                VALUES (90001, 1, 'ns-no-pod-only', 'Active', 'NONE', now())
+                """);
+
+        assertThat(searchRepository.search("ns-no-pod-only", null, 0, 21)).isEmpty();
     }
 }

@@ -53,6 +53,29 @@ describe('성공 케이스', () => {
     expect(within(tree()).queryByRole('button', { name: 'pod-error' })).not.toBeInTheDocument();
     expect(requestLog).toContain('/nodes/2/namespaces/1/pods');
   });
+
+  test('SEARCH-T13 공유 Namespace를 고르면 Pod가 있는 최소 ID Node 경로를 연다', async () => {
+    // ns-01-001은 node-01-01과 node-01-02에 Pod가 있다. 대표 경로는 node-01-01이다
+    const user = renderApp();
+    await waitForRow('cluster-01');
+    await user.type(searchInput(), 'ns-01-001');
+
+    const result = await within(searchPanel()).findByRole('button', { name: /ns-01-001/ });
+    expect(result).toHaveTextContent('cluster-01 › node-01-01 › ns-01-001');
+    await user.click(result);
+
+    expect(
+      await within(detailPanel()).findByText('ns-01-001', { selector: 'strong' }),
+    ).toBeVisible();
+    const selected = within(tree())
+      .getAllByRole('treeitem')
+      .filter((item) => item.getAttribute('aria-selected') === 'true');
+    expect(selected).toHaveLength(1);
+    expect(selected[0]).toHaveTextContent('ns-01-001');
+    expect(requestLog).toContain('/nodes/1/namespaces');
+    expect(requestLog).not.toContain('/nodes/2/namespaces');
+    expect(requestLog).toContain('/resources/NAMESPACE/1?nodeId=1');
+  });
 });
 
 describe('실패 케이스', () => {
