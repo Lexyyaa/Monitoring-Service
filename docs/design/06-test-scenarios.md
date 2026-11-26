@@ -207,6 +207,12 @@
   - When: 새로고침 클릭, 완료까지 기다림
   - Then: 필터, 검색어, 펼침, 상세가 모두 그대로
   - 테스트: `refresh.test.tsx`
+- **SEARCH-T13** 공유 Namespace 검색 결과를 고르면 Pod가 있는 최소 ID Node 경로를 연다
+  - 지키는 위험: 같은 Namespace가 여러 Node에 걸칠 때 다른 Node 경로를 열거나 여러 경로를 함께 요청함
+  - Given: `ns-01-001`이 `node-01-01`, `node-01-02`에 걸침
+  - When: `ns-01-001` 검색 → 결과 클릭
+  - Then: 결과 경로가 `cluster-01 › node-01-01 › ns-01-001`, 그 행이 선택되고 상세 표시. `/nodes/1/namespaces`와 `nodeId=1` 상세만 요청하고 `/nodes/2/namespaces`는 요청하지 않음
+  - 테스트: `search.test.tsx`
 
 ### 실패 케이스
 

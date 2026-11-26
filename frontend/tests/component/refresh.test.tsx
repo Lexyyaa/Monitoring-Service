@@ -140,6 +140,26 @@ describe('상태 유지와 복구', () => {
     ).toBeVisible();
   });
 
+  test('필터를 바꾸거나 되돌린 뒤에도 새로고침은 화면에 보이는 펼친 분기를 다시 부른다', async () => {
+    const user = renderApp();
+    await expand(user, 'cluster-01');
+    await waitForRow('node-01-02');
+
+    await selectFilter(user, 'ERROR');
+    await waitFor(() => expect(within(tree()).queryByText('node-01-02')).not.toBeInTheDocument());
+    requestLog.length = 0;
+    await user.click(refreshButton());
+    await waitFor(() => expect(requestLog).toContain('/clusters/1/nodes?issueLevel=ERROR'));
+
+    // 이미 받아 둔 필터로 돌아오면 캐시로 바로 그리므로 보이는 분기 집합이 그대로다
+    await selectFilter(user, '전체');
+    await waitForRow('node-01-02');
+    await waitFor(() => expect(refreshButton()).toHaveTextContent('새로고침'));
+    requestLog.length = 0;
+    await user.click(refreshButton());
+    await waitFor(() => expect(requestLog).toContain('/clusters/1/nodes'));
+  });
+
   test('REFRESH-T06 오래전에 바뀐 리소스는 마지막 갱신과 조회 시각을 다르게 보여 준다', async () => {
     updateResource('CLUSTER', 2, { lastUpdatedAt: '2026-10-01T00:00:00Z' });
     const user = renderApp();

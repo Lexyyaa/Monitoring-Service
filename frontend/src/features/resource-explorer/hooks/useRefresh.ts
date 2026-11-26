@@ -1,4 +1,11 @@
-import { useQueryClient } from '@tanstack/react-query';
+/************************************************************
+ * 자동 갱신 훅
+ * 30초마다, 또는 새로고침 버튼을 누를 때 지금 화면에서 쓰는 조회만 다시 부른다
+ * 스크롤 중일 때는 폴링을 스크롤이 멈춘 뒤로 미룸으로써 스크롤이 끊기지 않게 한다
+ * 응답이 성공할 때 가장 최근 fetchedAt을 마지막 성공 조회 시각으로 보여 준다
+ ************************************************************/
+
+import { useQueryClient, type Query } from '@tanstack/react-query';
 import { useCallback, useEffect, useRef, useState } from 'react';
 
 const POLLING_INTERVAL_MS = 30_000;
@@ -20,17 +27,31 @@ function readFetchedAt(data: unknown): string | undefined {
  * 사용자가 스크롤하는 중이면 폴링을 스크롤이 멈추고 1초 뒤로 미룬다
  * (분기 220개를 펼친 채 스크롤 중 폴링이 겹치면 그 1초가 16fps로 떨어졌다. 수동 새로고침은 미루지 않는다)
  ************************************************************/
-export function useRefresh() {
+interface UseRefreshOptions {
+  /** 다시 부를 조회를 더 좁힌다 (트리는 화면에 보이는 분기만) */
+  shouldRefetch?: (query: Query) => boolean;
+}
+
+export function useRefresh({ shouldRefetch }: UseRefreshOptions = {}) {
   const queryClient = useQueryClient();
   const [isRefreshing, setRefreshing] = useState(false);
   const [lastSuccessfulFetch, setLastSuccessfulFetch] = useState<string>();
   const inFlight = useRef(0);
+  const shouldRefetchRef = useRef(shouldRefetch);
+  shouldRefetchRef.current = shouldRefetch;
 
+  /**
+   * 진행 중인 요청은 취소하지 않고 이어 받는다 (cancelRefetch: false)
+   * 기본값(true)이면 갱신이 30초를 넘을 때 다음 폴링이 앞 요청을 취소하고 다시 시작해 끝나지 않을 수 있다
+   */
   const refresh = useCallback(async () => {
     inFlight.current += 1;
     setRefreshing(true);
     try {
-      await queryClient.refetchQueries({ type: 'active' });
+      await queryClient.refetchQueries(
+        { type: 'active', predicate: (query) => shouldRefetchRef.current?.(query) ?? true },
+        { cancelRefetch: false },
+      );
     } finally {
       inFlight.current -= 1;
       if (inFlight.current === 0) setRefreshing(false);
@@ -45,6 +66,8 @@ export function useRefresh() {
     };
     const poll = () => {
       if (document.visibilityState === 'hidden') return;
+      // 앞 갱신이 아직 끝나지 않았으면 이번 폴링은 건너뛴다 (갱신이 겹쳐 쌓이지 않게)
+      if (inFlight.current > 0) return;
       if (performance.now() - lastScrollAt < SCROLL_IDLE_MS) {
         window.clearTimeout(deferTimer);
         deferTimer = window.setTimeout(poll, SCROLL_IDLE_MS);
