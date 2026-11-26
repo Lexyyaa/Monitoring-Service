@@ -12,7 +12,6 @@ import ResourceSearch from '../features/resource-explorer/components/ResourceSea
 import ResourceTree from '../features/resource-explorer/components/ResourceTree';
 import { useRefresh } from '../features/resource-explorer/hooks/useRefresh';
 import { useResourceDetail } from '../features/resource-explorer/hooks/useResourceDetail';
-import { useResourceSearch } from '../features/resource-explorer/hooks/useResourceSearch';
 import {
   useResourceTree,
   type TreeSelection,
@@ -30,7 +29,6 @@ export default function MonitoringPage() {
 
   const tree = useResourceTree({ issueLevel, onSelect: setSelected });
   const refresh = useRefresh({ shouldRefetch: tree.isQueryInView });
-  const search = useResourceSearch(issueLevel);
   const detail = useResourceDetail(selection);
 
   const isDetailOpen = selection !== undefined;
@@ -71,7 +69,10 @@ export default function MonitoringPage() {
       <main className={`explorer-layout ${isDetailOpen ? 'with-detail' : ''}`}>
         <div className="explorer-main">
           <IssueLevelFilter value={issueLevel} onChange={setIssueLevel} />
-          <ResourceSearch search={search} onSelectResult={(item) => void tree.openPath(item)} />
+          <ResourceSearch
+            issueLevel={issueLevel}
+            onSelectResult={(item) => void tree.openPath(item)}
+          />
           <ResourceTree tree={tree} selectedKey={selected?.key} />
         </div>
         <ResourceDetailPanel

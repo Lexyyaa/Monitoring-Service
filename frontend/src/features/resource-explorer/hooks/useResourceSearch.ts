@@ -2,9 +2,10 @@
  * 검색 관리 훅
  * 입력이 300ms 멈출 때 검색을 요청하고, 더 보기를 누를 때 다음 20건을 이어 받는다
  * 검색어마다 캐시를 나눔으로써 늦게 온 예전 응답이 현재 결과를 덮지 않게 한다
+ * 새 결과가 올 때까지 이전 결과를 "검색 중"과 함께 보여 줌으로써 목록이 비었다가 채워지며 깜빡이지 않게 한다
  ************************************************************/
 
-import { useInfiniteQuery } from '@tanstack/react-query';
+import { keepPreviousData, useInfiniteQuery } from '@tanstack/react-query';
 import { useMemo, useState } from 'react';
 import { toErrorMessage } from '../../../shared/lib/errorMessage';
 import { useDebouncedValue } from '../../../shared/lib/useDebouncedValue';
@@ -18,7 +19,10 @@ export function useResourceSearch(issueLevel?: IssueLevel) {
   const [input, setInput] = useState('');
   const query = useDebouncedValue(input.trim(), SEARCH_DEBOUNCE_MS);
 
-  const result = useInfiniteQuery(resourceQueries.search(query, issueLevel));
+  const result = useInfiniteQuery({
+    ...resourceQueries.search(query, issueLevel),
+    placeholderData: keepPreviousData,
+  });
 
   /************************************************************
    * 페이지 합치기 : 같은 리소스(종류:ID)는 처음 나온 것만 남긴다
@@ -40,8 +44,8 @@ export function useResourceSearch(issueLevel?: IssueLevel) {
     setInput,
     query,
     items,
-    isLoading: result.isLoading || result.isFetchingNextPage,
-    isEmpty: result.isSuccess && items.length === 0,
+    isLoading: result.isLoading || result.isFetchingNextPage || result.isPlaceholderData,
+    isEmpty: result.isSuccess && !result.isPlaceholderData && items.length === 0,
     errorMessage: result.isError ? toErrorMessage(result.error, '검색에 실패했습니다.') : undefined,
     /** 갱신이 실패해 이전에 성공한 결과를 그대로 보여 주는 중 */
     isStale: result.isError && items.length > 0,
