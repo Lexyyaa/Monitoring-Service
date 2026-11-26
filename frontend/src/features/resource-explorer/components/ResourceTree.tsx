@@ -1,3 +1,9 @@
+/************************************************************
+ * 트리 화면
+ * 트리 영역을 스크롤할 때 보이는 행만 그리고, 그 범위를 훅에 알려 갱신이 화면 안 분기만 다시 부르게 한다
+ * 검색 결과로 행을 열 때 그 행이 화면 밖이면 가운데로 스크롤한다
+ ************************************************************/
+
 import { useEffect, useRef } from 'react';
 import { useVirtualWindow } from '../../../shared/lib/useVirtualWindow';
 import type { ResourceTreeState } from '../hooks/useResourceTree';
@@ -24,6 +30,12 @@ export default function ResourceTree({ tree, selectedKey }: ResourceTreeProps) {
   });
 
   const alertMessage = tree.rootError ?? tree.navigationError;
+
+  /** 화면에 보이는 범위를 알려 갱신이 그 분기만 다시 부르게 한다 */
+  const { setVisibleRange } = tree;
+  useEffect(() => {
+    setVisibleRange(view.start, view.end);
+  }, [setVisibleRange, view.start, view.end]);
 
   /************************************************************
    * 검색 결과로 연 행이 화면 밖이면 그 행이 가운데 오도록 스크롤 (요청마다 한 번)
@@ -62,11 +74,13 @@ export default function ResourceTree({ tree, selectedKey }: ResourceTreeProps) {
         aria-busy={tree.isFetching}
         onScroll={view.onScroll}
       >
+        {/* 위아래 빈 공간으로 전체 높이를 맞추고, 그 사이에 화면 근처 행만 그린다 */}
+        {/* key는 배열 순서가 아니라 종류, ID, 경로로 만든 행 key다 (스크롤해도 행이 섞이지 않음) */}
         <div style={{ height: view.spaceBefore }} />
         {rows.slice(view.start, view.end).map((row) => (
           <ResourceTreeRow
             key={row.key}
-            row={row}
+            row={tree.viewOf(row)}
             height={ROW_HEIGHT}
             isSelected={selectedKey === row.key}
             onToggle={tree.toggle}
