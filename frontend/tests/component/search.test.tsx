@@ -5,7 +5,8 @@
 
 import { act, waitFor, within } from '@testing-library/react';
 import { delay, http, HttpResponse } from 'msw';
-import { describe, expect, test } from 'vitest';
+import type { ComponentType } from 'react';
+import { describe, expect, test, vi } from 'vitest';
 import { API, requestLog, server, unavailable } from '../mocks/server';
 import {
   detailPanel,
@@ -18,6 +19,46 @@ import {
   tree,
   waitForRow,
 } from './helpers';
+
+/************************************************************
+ * 렌더 횟수 : 검색 영역 밖 컴포넌트가 몇 번 그려졌는지 센다 (V2-01)
+ ************************************************************/
+const renders = vi.hoisted(() => new Map<string, number>());
+
+function counted<P extends object>(name: string, Component: ComponentType<P>) {
+  return function Counted(props: P) {
+    renders.set(name, (renders.get(name) ?? 0) + 1);
+    return <Component {...props} />;
+  };
+}
+
+vi.mock('../../src/features/resource-explorer/components/ResourceTree', async (original) => ({
+  default: counted(
+    'ResourceTree',
+    ((await original()) as { default: ComponentType<never> }).default,
+  ),
+}));
+vi.mock(
+  '../../src/features/resource-explorer/components/ResourceDetailPanel',
+  async (original) => ({
+    default: counted(
+      'ResourceDetailPanel',
+      ((await original()) as { default: ComponentType<never> }).default,
+    ),
+  }),
+);
+vi.mock('../../src/features/resource-explorer/components/IssueLevelFilter', async (original) => ({
+  default: counted(
+    'IssueLevelFilter',
+    ((await original()) as { default: ComponentType<never> }).default,
+  ),
+}));
+vi.mock('../../src/features/resource-explorer/components/RefreshControl', async (original) => ({
+  default: counted(
+    'RefreshControl',
+    ((await original()) as { default: ComponentType<never> }).default,
+  ),
+}));
 
 const searchRequests = () => requestLog.filter((url) => url.startsWith('/resources/search'));
 
@@ -98,6 +139,25 @@ describe('실패 케이스', () => {
     await user.click(within(alert).getByRole('button', { name: '다시 시도' }));
 
     expect(await within(searchPanel()).findByText('pod-error')).toBeVisible();
+  });
+});
+
+describe('렌더링', () => {
+  test('V2-01 검색어를 입력해도 검색 영역 밖 컴포넌트는 다시 그리지 않는다', async () => {
+    const user = renderApp();
+    await expand(user, 'cluster-01');
+    await openDetail(user, 'cluster-01');
+    await act(() => delay(100));
+    renders.clear();
+
+    await user.type(searchInput(), 'pod-shared');
+    // 입력하는 동안 (디바운스 전) : 한 번도 그리지 않는다
+    expect(Object.fromEntries(renders)).toEqual({});
+
+    await within(searchPanel()).findByRole('button', { name: /pod-shared/ });
+    // 응답 뒤 : 마지막 갱신 시각이 바뀌어 페이지가 한 번 그려진다 (useRefresh)
+    console.info('V2-01 렌더 횟수 (10글자 입력, 응답까지):', Object.fromEntries(renders));
+    for (const count of renders.values()) expect(count).toBeLessThanOrEqual(1);
   });
 });
 
