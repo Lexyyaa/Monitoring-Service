@@ -159,6 +159,30 @@ describe('렌더링', () => {
     console.info('V2-01 렌더 횟수 (10글자 입력, 응답까지):', Object.fromEntries(renders));
     for (const count of renders.values()) expect(count).toBeLessThanOrEqual(1);
   });
+
+  test('V2-01 검색어를 바꾸는 동안 이전 결과를 비우지 않는다', async () => {
+    server.use(
+      http.get(`${API}/resources/search`, async ({ request }) => {
+        if (new URL(request.url).searchParams.get('q') === 'pod-ok') await delay(500);
+        return undefined;
+      }),
+    );
+    const user = renderApp();
+    await user.type(searchInput(), 'pod');
+    await within(searchPanel()).findByText('pod-error');
+
+    await user.type(searchInput(), '-ok');
+    await waitFor(() => expect(searchRequests()).toContain('/resources/search?q=pod-ok&page=0'));
+
+    expect(within(searchPanel()).getByText('pod-error')).toBeVisible();
+    expect(within(searchPanel()).getByText('검색 중…')).toBeVisible();
+    // 이전 결과(pod)에도 pod-ok가 있으므로 "검색 중"이 사라질 때까지 기다린다
+    await waitFor(() =>
+      expect(within(searchPanel()).queryByText('검색 중…')).not.toBeInTheDocument(),
+    );
+    expect(within(searchPanel()).getByText('pod-ok')).toBeVisible();
+    expect(within(searchPanel()).queryByText('pod-error')).not.toBeInTheDocument();
+  });
 });
 
 describe('엣지 케이스', () => {
