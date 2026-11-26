@@ -8,6 +8,11 @@ import java.util.Map;
 import lombok.AccessLevel;
 import lombok.NoArgsConstructor;
 
+/************************************************************
+ * HTTP 응답 JSON (OpenAPI 계약과 같은 모양)
+ * Controller가 응답할 때 Info를 이 모양으로 바꾼다
+ * Info와 필드가 거의 같지만 따로 둠으로써 JSON 표현(@JsonInclude 등)을 Presentation에만 둔다
+ ************************************************************/
 @NoArgsConstructor(access = AccessLevel.PRIVATE)
 public final class ResourceResponse {
 

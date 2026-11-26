@@ -17,6 +17,11 @@ import java.util.Optional;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Repository;
 
+/************************************************************
+ * 단건 조회 저장소 구현
+ * 서비스가 ID로 리소스를 찾거나 Namespace의 Node 경로를 확인할 때 쓴다
+ * 단건은 Spring Data JPA, 조인과 서브쿼리는 QueryDSL을 씀으로써 단순한 조회에 쿼리를 직접 쓰지 않는다
+ ************************************************************/
 @Repository
 @RequiredArgsConstructor
 public class ResourceRepositoryImpl implements ResourceRepository {

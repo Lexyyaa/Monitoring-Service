@@ -5,7 +5,8 @@ import lombok.RequiredArgsConstructor;
 
 /************************************************************
  * 업무 오류 코드와 사용자 안내 문구
- * HTTP 상태 대응은 support 계층의 GlobalExceptionHandler가 맡는다 (Domain은 HTTP를 모른다)
+ * 예외를 응답으로 바꿀 때 GlobalExceptionHandler가 이 코드로 HTTP 상태와 문구를 정한다
+ * 문구를 코드와 함께 고정함으로써 응답에 내부 메시지가 섞이지 않게 한다
  ************************************************************/
 @Getter
 @RequiredArgsConstructor

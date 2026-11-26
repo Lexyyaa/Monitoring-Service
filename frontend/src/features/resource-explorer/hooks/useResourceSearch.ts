@@ -1,3 +1,9 @@
+/************************************************************
+ * 검색 관리 훅
+ * 입력이 300ms 멈출 때 검색을 요청하고, 더 보기를 누를 때 다음 20건을 이어 받는다
+ * 검색어마다 캐시를 나눔으로써 늦게 온 예전 응답이 현재 결과를 덮지 않게 한다
+ ************************************************************/
+
 import { useInfiniteQuery } from '@tanstack/react-query';
 import { useMemo, useState } from 'react';
 import { toErrorMessage } from '../../../shared/lib/errorMessage';

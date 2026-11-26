@@ -12,6 +12,11 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 
+/************************************************************
+ * 리소스 조회 API (GET만 있다. 상태를 바꾸는 API는 없다)
+ * HTTP 요청이 들어올 때 경로와 파라미터를 검사해 Command로 넘기고, 결과 Info를 응답 JSON으로 바꾼다
+ * 저장소나 SQL을 직접 부르지 않음으로써 HTTP 처리와 조회 규칙을 나눈다
+ ************************************************************/
 @RestController
 @RequestMapping(value = "/api/v1", produces = MediaType.APPLICATION_JSON_VALUE)
 @RequiredArgsConstructor

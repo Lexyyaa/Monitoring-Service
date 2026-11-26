@@ -15,6 +15,11 @@ import org.hibernate.Session;
 import org.hibernate.type.StandardBasicTypes;
 import org.springframework.stereotype.Repository;
 
+/************************************************************
+ * 통합 검색 구현 (네이티브 SQL)
+ * 검색을 요청받을 때 네 테이블을 UNION ALL로 합쳐 이름 부분 일치를 찾고, 정렬과 페이지를 DB에서 처리한다
+ * 한 쿼리로 합침으로써 종류가 섞인 결과를 하나의 순서로 페이지 나눌 수 있다
+ ************************************************************/
 @Repository
 @RequiredArgsConstructor
 public class ResourceSearchRepositoryImpl implements ResourceSearchRepository {

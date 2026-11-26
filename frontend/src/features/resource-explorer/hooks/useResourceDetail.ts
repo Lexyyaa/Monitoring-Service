@@ -1,3 +1,9 @@
+/************************************************************
+ * 상세 조회 훅
+ * 트리 행이나 검색 결과를 선택할 때 그 리소스의 상세를 요청한다
+ * 실패할 때 이전 상세를 지우지 않음으로써 오류 문구와 마지막 값을 함께 보여 준다
+ ************************************************************/
+
 import { useQuery } from '@tanstack/react-query';
 import { toErrorMessage } from '../../../shared/lib/errorMessage';
 import { resourceQueries } from '../api/resourceQueries';

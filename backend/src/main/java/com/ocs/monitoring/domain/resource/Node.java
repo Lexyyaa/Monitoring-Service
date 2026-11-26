@@ -17,6 +17,12 @@ import lombok.Getter;
 import lombok.NoArgsConstructor;
 import org.hibernate.annotations.Immutable;
 
+/************************************************************
+ * Node 엔티티 (nodes 테이블, Cluster에 속함)
+ * Pod 목록을 요청받을 때 함께 받은 Namespace가 같은 Cluster인지 직접 확인한다
+ * 이 규칙을 Node가 가짐으로써 서비스에 업무 판단용 if를 두지 않는다 (ADR-008)
+ * @Immutable로 둠으로써 조회 전용임을 보장한다 (변경 감지, UPDATE 없음)
+ ************************************************************/
 @Entity
 @Immutable
 @Table(name = "nodes")

@@ -18,9 +18,10 @@ import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Repository;
 
 /************************************************************
- * 트리 조회 (QueryDSL)
- * 목록에 필요한 컬럼만 프로젝션하고, 정렬은 이름·ID 순서로 DB에서 처리한다
- * 필터는 자기 일치 OR 하위 EXISTS로 만든다. 하위 근거는 트리에서 펼쳐 도달할 수 있는 리소스만 쓴다
+ * 트리 조회 구현 (QueryDSL)
+ * 부모를 펼칠 때 목록에 필요한 컬럼만 프로젝션하고, 이름, ID 순서 정렬을 DB에서 처리한다
+ * 필터는 자기 일치 OR 하위 EXISTS로 만든다
+ * 하위 근거를 트리로 도달할 수 있는 리소스로만 둠으로써 펼쳤을 때 보이지 않는 근거로 PATH가 붙지 않게 한다
  ************************************************************/
 @Repository
 @RequiredArgsConstructor
